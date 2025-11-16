@@ -1,0 +1,40 @@
+.sidebar {
+  width: 240px;
+  background: #f8fafb;
+  border-right: 2px solid #ebedef;
+  min-height: 100vh;
+  padding: 1rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+
+.sidebar-section h3 {
+  margin: 10px 0;
+  font-weight: 700;
+}
+
+.sidebar-divider {
+  margin: 20px 0 10px 0;
+  font-size: 0.95rem;
+  color: #207e8e;
+  font-weight: bold;
+  border-bottom: 1px solid #ced6da;
+}
+
+nav ul {
+  list-style: none;
+  padding-left: 10px;
+}
+
+nav ul li {
+  margin: 8px 0;
+  cursor: pointer;
+  transition: background 0.2s;
+  padding: 6px 8px;
+  border-radius: 4px;
+}
+
+nav ul li:hover,
+nav ul li.active {
+  background: #207e8e;
+  color: #fff;
+}

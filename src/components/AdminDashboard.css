@@ -1,0 +1,64 @@
+.dashboard-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* <--- así creas dos columnas en cada fila */
+  gap: 25px;
+  max-width: 950px;          /* puedes aumentar el ancho si quieres más espacio */
+  margin: 40px auto;
+}
+
+
+.card {
+  background: linear-gradient(180deg, #ffffff 70%, #eaf2fd 100%);
+  border-radius: 12px;
+  box-shadow: 0 3px 12px rgba(52, 100, 184, 0.10);
+  padding: 25px 18px;
+  text-align: center;
+  color: #183060;
+  margin-bottom: 15px;
+}
+
+.super-admin-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background: #f8fafc;
+}
+
+.panel-selector {
+  background: white;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.panel-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.panel-btn {
+  padding: 12px 20px;
+  border: 1px solid #e2e8f0;
+  background: white;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.panel-btn:hover {
+  background: #f1f5f9;
+}
+
+.panel-btn.active {
+  background: #3b82f6;
+  color: white;
+  border-color: #3b82f6;
+}
+
+.panel-content {
+  flex: 1;
+  padding: 30px;
+}
+
+
