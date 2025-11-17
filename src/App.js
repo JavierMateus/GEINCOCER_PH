@@ -18,7 +18,6 @@ import PagosMorosidadPanel from './components/PagosMorosidadPanel';
 import InformeMorosidad from './components/InformeMorosidad';
 import GraficosMorosidad from './components/GraficosMorosidad';
 
-
 // ...otros imports
 
 // Ajusta la ruta si la carpeta/components cambia según tu proyecto
