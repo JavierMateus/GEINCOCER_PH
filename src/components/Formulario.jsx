@@ -37,32 +37,27 @@ const buttonStyle = {
 };
 
 const Formulario = () => {
-  const [form, setForm] = useState({
-    nombre: '',
-    documento: '',
-  });
+  const [form, setForm] = useState({ nombre: '', documento: '' });
+  const [mensaje, setMensaje] = useState('');
+  const [cargando, setCargando] = useState(false);
 
   const handleChange = (e) => {
-    setForm({
-      ...form,
-      [e.target.name]: e.target.value,
-    });
+    setForm({ ...form, [e.target.name]: e.target.value });
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // Endpoint POST - reemplaza por tu URL
-    const endpoint = 'https://tuservidor.com/api/endpoint';
+    setCargando(true);
+    setMensaje('');
+
     try {
-      const response = await fetch(endpoint, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(form),
-      });
-      const data = await response.json();
-      console.log('Respuesta:', data);
+      // Simulación de envío (puedes reemplazar con tu API real)
+      await new Promise((resolve) => setTimeout(resolve, 1500));
+      setMensaje(`Formulario enviado correctamente. ¡Hola, ${form.nombre}!`);
     } catch (error) {
-      console.error('Error en el envío:', error);
+      setMensaje('Error en el envío. Intenta nuevamente.');
+    } finally {
+      setCargando(false);
     }
   };
 
@@ -91,10 +86,17 @@ const Formulario = () => {
         required
       />
       <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-        <button style={buttonStyle} type="submit">Enviar</button>
+        <button style={buttonStyle} type="submit" disabled={cargando}>
+          {cargando ? 'Enviando...' : 'Enviar'}
+        </button>
       </div>
+      {mensaje && (
+        <p style={{ marginTop: '1em', color: '#218290', fontWeight: 'bold' }}>
+          {mensaje}
+        </p>
+      )}
     </form>
   );
-}; // <- así se cierra el componente correctamente
+};
 
 export default Formulario;
