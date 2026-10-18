@@ -1,0 +1,134 @@
+[
+  {
+    "id": 1765829087790,
+    "Título": "Circular de prueba",
+    "Tipo": "General",
+    "Adjunto": "circular001.pdf",
+    "fecha": "2025-12-15"
+  },
+  {
+    "id": 1765831142279,
+    "Título": "Prueba 2 desde frontend.",
+    "Tipo": "Circular",
+    "Adjunto": "",
+    "fecha": "2025-12-15"
+  },
+  {
+    "id": 1765831370388,
+    "Título": "CorteAgua",
+    "Tipo": "Aviso",
+    "Adjunto": "corteAgua.pdf.pdf",
+    "fecha": "2025-12-15"
+  },
+  {
+    "id": 1765832265736,
+    "Título": "ManualSeguridad",
+    "Tipo": "Informe",
+    "Adjunto": "manualSeg.pdf.pdf",
+    "fecha": "2025-12-15"
+  },
+  {
+    "id": 1765834492936,
+    "Título": "ConvocatoriaAsmabkea",
+    "Tipo": "informe",
+    "Adjunto": "Convocatoria_Asamblea.docx",
+    "fecha": "2025-12-15"
+  },
+  {
+    "id": 1765836075359,
+    "Título": "IJVICNi",
+    "Tipo": "CQCQ",
+    "Adjunto": "manualSeg.pdf.pdf",
+    "fecha": "2025-12-15"
+  },
+  {
+    "id": 1765979193186,
+    "Título": "ManualSeguridad",
+    "Tipo": "Circular",
+    "Adjunto": "manualSeg.pdf.pdf",
+    "fecha": "2025-12-17"
+  },
+  {
+    "id": 1765979917990,
+    "Título": "Propuesta",
+    "Tipo": "QSWONOWON",
+    "Adjunto": "Propuesta Gerencial.pdf",
+    "fecha": "2025-12-17"
+  },
+  {
+    "id": 1765982365484,
+    "Título": "BsaeResid",
+    "Tipo": "Cuadro",
+    "Adjunto": "BaseResidencial.xlsx",
+    "fecha": "2025-12-17"
+  },
+  {
+    "id": 1777388105409,
+    "ID_Archivo": "1777388105409",
+    "Título": "corteAgua",
+    "Tipo": "Inforne",
+    "Fecha_Publicación": "28/4/2026",
+    "Autor": "YO",
+    "Descripción": "Racionamiento",
+    "Adjunto": "1777388105370-corteAgua.pdf.pdf",
+    "URL_Archivo": "/Notificaciones/1777388105370-corteAgua.pdf.pdf",
+    "Destinatarios": "-",
+    "Vigente_Desde": "28/4/2026",
+    "Vigente_Hasta": "-",
+    "Prioridad": "-",
+    "Estado": "Publicado",
+    "Firma_Digital": "-",
+    "Visualizado_Por": "-",
+    "Fecha_Actualización": "-",
+    "Versión": "-",
+    "Confirmación_Recibido": "-",
+    "Link_Referencia": "-",
+    "fecha": "2026-04-28"
+  },
+  {
+    "id": 1777388202292,
+    "ID_Archivo": "1777388202292",
+    "Título": "ICFESEJMS",
+    "Tipo": "Certificado",
+    "Fecha_Publicación": "28/4/2026",
+    "Autor": "YO",
+    "Descripción": "EMCSOWDKWI",
+    "Adjunto": "1777388202270-ICFESEJMS.pdf",
+    "URL_Archivo": "/Notificaciones/1777388202270-ICFESEJMS.pdf",
+    "Destinatarios": "-",
+    "Vigente_Desde": "28/4/2026",
+    "Vigente_Hasta": "-",
+    "Prioridad": "-",
+    "Estado": "Publicado",
+    "Firma_Digital": "-",
+    "Visualizado_Por": "-",
+    "Fecha_Actualización": "-",
+    "Versión": "-",
+    "Confirmación_Recibido": "-",
+    "Link_Referencia": "-",
+    "fecha": "2026-04-28"
+  },
+  {
+    "id": 1777391176734,
+    "ID_Archivo": "1777391176734",
+    "Título": "manualSeg",
+    "Tipo": "Manual",
+    "Fecha_Publicación": "28/4/2026",
+    "Autor": "YO",
+    "Descripción": "Instructivo",
+    "Adjunto": "1777391176700-manualSeg.pdf.pdf",
+    "URL_Archivo": "/Notificaciones/1777391176700-manualSeg.pdf.pdf",
+    "Destinatarios": "-",
+    "Vigente_Desde": "28/4/2026",
+    "Vigente_Hasta": "-",
+    "Prioridad": "-",
+    "Estado": "Publicado",
+    "Firma_Digital": "-",
+    "Visualizado_Por": "-",
+    "Fecha_Actualización": "-",
+    "Versión": "-",
+    "Confirmación_Recibido": "-",
+    "Link_Referencia": "-",
+    "fecha": "2026-04-28"
+  }
+]

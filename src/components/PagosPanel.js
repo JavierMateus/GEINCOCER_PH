@@ -1,17 +1,17 @@
 import React, { useState } from "react";
-import { generarComprobantePago } from "../utils/generarComprobantePago";
+import { descargarComprobante } from "./comprobantePago";
 import FormularioPago from "./FormularioPago";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import * as XLSX from "xlsx";
 import Papa from "papaparse";
 
-
 function PagosPanel({ pagosData: inicial, onOcultar, exportarExcel, exportarPDF }) {
   const [mostrarMorosos, setMostrarMorosos] = useState(false);
   const [showPagoModal, setShowPagoModal] = useState(false);
   const [pagos, setPagos] = useState(inicial); // <<--- aquí
-
+  const [pagosPendientesConfirmacion, setPagosPendientesConfirmacion] = useState([]);
+  
   // Función para convertir número de Excel a fecha
   function excelDateToJSDate(excelDate) {
     return new Date((excelDate - 25569) * 86400 * 1000);
@@ -74,6 +74,27 @@ function PagosPanel({ pagosData: inicial, onOcultar, exportarExcel, exportarPDF 
     if (isNaN(num)) return "-";
     return num.toLocaleString("es-CO", { minimumFractionDigits: 0, maximumFractionDigits: 0 });
   }
+
+  const confirmarPagoPendiente = (pagoPendiente) => {
+  const pagoConfirmado = {
+  ...pagoPendiente,
+  Estado: "Pagado",
+  Fecha_pago: new Date().toLocaleDateString("es-CO"),
+  Fecha_Registro: new Date().toLocaleDateString("es-CO"),
+  Registrado_por: "Administrador",
+};
+
+  setPagos((prev) => [...prev, pagoConfirmado]);
+  setPagosPendientesConfirmacion((prev) =>
+    prev.filter((p) => p.ID_Pago !== pagoPendiente.ID_Pago)
+  );
+};
+
+const rechazarPagoPendiente = (pagoPendiente) => {
+  setPagosPendientesConfirmacion((prev) =>
+    prev.filter((p) => p.ID_Pago !== pagoPendiente.ID_Pago)
+  );
+};
 
     // Exportar TODO el estado 'pagos' a Excel
 function exportarExcelLocal() {
@@ -176,7 +197,7 @@ function exportarMorososLocal() {
     }
   );
 
-  // Exportador solo morosos
+    // Exportador solo morosos
   function exportarMorosos() {
     const csv = Papa.unparse(morosos, { delimiter: ";" });
     const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
@@ -207,27 +228,9 @@ function calcularInteresYExtra(p) {
   return (
 
         <div style={{ padding: "2em" }}>
-      <h2>Gestión de Pagos / Exportar Morosos</h2>
-      {/* --- TABLA PRINCIPAL --- */}
+  <h2>Gestión de Pagos / Exportar Morosos</h2>
 
-      <button
-  style={{
-    background: "#15aabf", color: "#fff", border: "none", borderRadius: 8,
-    padding: "8px 20px", fontWeight: "bold", marginBottom: 16, cursor: "pointer"
-  }}
-  onClick={() => setShowPagoModal(true)}
->
-  + Registrar Pago Manual
-</button>
-
-{showPagoModal && (
-  <FormularioPago
-    onGuardar={nuevoPago => { setPagos([...pagos, nuevoPago]); setShowPagoModal(false); }}
-    onClose={() => setShowPagoModal(false)}
-  />
-)}
-
-      <table border={1} cellPadding={3} style={{ width: "100%", fontSize: ".95em" }}>
+        <table border={1} cellPadding={3} style={{ width: "100%", fontSize: ".95em" }}>
         <thead>
           <tr>
             <th>ID Pago</th>
@@ -246,8 +249,8 @@ function calcularInteresYExtra(p) {
             <th>Cobro Especial</th>
             <th>Total a Cobrar</th>
             <th>Observaciones</th>
-            <th>Registrado por</th>
-            <th>Fecha Registro</th>
+            <th>Registrado_por</th>
+            <th>Fecha_Registro</th>
             <th>Comprobante</th>
             </tr>
         </thead>
@@ -281,15 +284,19 @@ function calcularInteresYExtra(p) {
     );
   })()}
   <td>{p.Observaciones || "-"}</td>
-  <td>{p["Registrado por"] || "-"}</td>
-  <td>{formatoFecha(p["Fecha Registro"])}</td>
+  <td>{p["Registrado_por"] || "-"}</td>
+<td>{formatoFecha(p["Fecha_Registro"])}</td>
   {/* Comprobante al FINAL */}
   <td>
     {p.Estado && p.Estado.toLowerCase() === "pagado" ? (
       <button
-        onClick={() => {
-          generarComprobantePago(p);
-        }}
+        onClick={async () => {
+  try {
+    await descargarComprobante(p.ID_Pago);
+  } catch (err) {
+    alert(err.message);
+  }
+}}
         style={{
           background: "#31980c", color: "#fff", padding: "6px 12px",
           border: "none", borderRadius: "6px", cursor: "pointer",

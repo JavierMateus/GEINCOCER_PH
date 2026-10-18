@@ -1,17 +1,15 @@
-// BotonImportacion.js
 import React, { useRef } from "react";
 
-
 const coloresBoton = {
-  notificaciones: "linear-gradient(135deg, #fae57c 30%, #ffe398 100%)",
-  habitantes: "linear-gradient(135deg, #1eb8aa 30%, #69e2ff 100%)",
-  inmuebles: "linear-gradient(135deg, #8884ff 30%, #56cad2 100%)",
-  parqueaderos: "linear-gradient(135deg, #ffae73 30%, #ffeba1 100%)",
-  incidentes: "linear-gradient(135deg, #fd6076 30%, #ffbb90 100%)",
-  pagos: "linear-gradient(135deg, #9933fa 30%, #c7a0f5 100%)",
-  reservas: "linear-gradient(135deg, #39c194 30%, #8ae6c6 100%)",
-  vehiculos: "linear-gradient(135deg, #3380fa 30%, #69afff 100%)",
-  mantenimiento: "linear-gradient(135deg, #e82e4aff 30%, #ffe0bb 100%)"
+  notificaciones: "linear-gradient(135deg, #f8ed9f 0%, #f7e5b7 100%)",
+  habitantes: "linear-gradient(135deg, #cdeeee 0%, #b8e6ef 100%)",
+  inmuebles: "linear-gradient(135deg, #dcdcff 0%, #cfdaf6 100%)",
+  parqueaderos: "linear-gradient(135deg, #ffe2c2 0%, #ffe9cf 100%)",
+  incidentes: "linear-gradient(135deg, #ffd4d8 0%, #ffdcca 100%)",
+  pagos: "linear-gradient(135deg, #e6d7ff 0%, #ddd0f9 100%)",
+  reservas: "linear-gradient(135deg, #d8f2e7 0%, #cfeedd 100%)",
+  vehiculos: "linear-gradient(135deg, #d8e9ff 0%, #cfe3ff 100%)",
+  mantenimiento: "linear-gradient(135deg, #ffd9df 0%, #ffe7d2 100%)",
 };
 
 const iconos = {
@@ -23,58 +21,80 @@ const iconos = {
   pagos: "💳",
   reservas: "📅",
   vehiculos: "🚗",
-  mantenimiento: "🔧"
+  mantenimiento: "🔧",
 };
 
-
-export default function BotonImportacion({ tipo, titulo, onFileChange, props }) {
+export default function BotonImportacion({ tipo, titulo, onFileChange }) {
   const fileInputRef = useRef();
 
-  // Abre el diálogo de archivos al hacer click en el botón
   const handleButtonClick = () => {
-    fileInputRef.current.click();
+    fileInputRef.current?.click();
   };
 
   return (
-    <div style={{ display:"flex", flexDirection:"column", alignItems:"center" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <button
         type="button"
         style={{
-          width: "220px",
-          height: "120px",
-          margin: "0.7em",
-          borderRadius: "18px",
+          width: "185px",
+          minHeight: "104px",
+          margin: "0.25em",
+          padding: "14px 12px",
+          borderRadius: "16px",
           background: coloresBoton[tipo],
-          color: "#232325",
-          fontWeight: "bold",
-          fontSize: "1.13em",
-          boxShadow: "0 6px 24px #b5cbe35d",
-          border: "none",
+          color: "#1f2937",
+          fontWeight: 700,
+          fontSize: "0.95rem",
+          lineHeight: 1.2,
+          boxShadow: "0 6px 16px rgba(15, 23, 42, 0.08)",
+          border: "1px solid rgba(255,255,255,0.55)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
           cursor: "pointer",
           position: "relative",
-          transition: "box-shadow 0.2s, transform 0.15s"
+          transition: "transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease",
+          textAlign: "center",
         }}
         onClick={handleButtonClick}
-        onMouseOver={e => {
-          e.currentTarget.style.boxShadow = "0 12px 32px #b5cbe38d";
-          e.currentTarget.style.transform = "translateY(-4px) scale(1.03)";
+        onMouseOver={(e) => {
+          e.currentTarget.style.boxShadow = "0 10px 22px rgba(15, 23, 42, 0.12)";
+          e.currentTarget.style.transform = "translateY(-2px)";
+          e.currentTarget.style.filter = "saturate(1.02)";
         }}
-        onMouseOut={e => {
-          e.currentTarget.style.boxShadow = "0 6px 24px #b5cbe35d";
-          e.currentTarget.style.transform = "none";
+        onMouseOut={(e) => {
+          e.currentTarget.style.boxShadow = "0 6px 16px rgba(15, 23, 42, 0.08)";
+          e.currentTarget.style.transform = "translateY(0)";
+          e.currentTarget.style.filter = "saturate(1)";
         }}
       >
-        <span style={{ fontSize: "2.6em", marginBottom: "0.25em" }}>{iconos[tipo]}</span>
-        {titulo}
+        <span
+          style={{
+            fontSize: "1.8rem",
+            marginBottom: "8px",
+            lineHeight: 1,
+          }}
+        >
+          {iconos[tipo]}
+        </span>
+
+        <span
+          style={{
+            display: "block",
+            maxWidth: "130px",
+            whiteSpace: "normal",
+            wordBreak: "break-word",
+          }}
+        >
+          {titulo}
+        </span>
       </button>
+
       <input
         type="file"
         accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
-        style={{ display: 'none' }}
+        style={{ display: "none" }}
         ref={fileInputRef}
         onChange={onFileChange}
       />

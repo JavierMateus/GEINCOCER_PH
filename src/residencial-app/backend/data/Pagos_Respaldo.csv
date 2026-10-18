@@ -1,0 +1,23 @@
+ID_Pago;ID_Inmueble;Torre/Manzana;Apto/Casa;ID_Habitante;Nombre;Telefono;Periodo;Concepto;Valor;Estado;Fecha de pago;M�todo Pago;Referencia/Transacci�n;Intereses;Cobro Especial;Observaciones;Registrado por;Fecha Registro;Comprobante_URL
+PAG001;INM001;T1;A103;1;Juan P�rez;647939;1/01/2025;250000;Pagado;15/04/2024;Transferencia;TR4567890;0;0;Pago realizado sin novedad;Admin;15/04/2024;comprobantes/PAG001.pdf
+PAG002;INM002;MzA;C9;2;Mar�a G�mez;32167382;1/12/2024;250000;Pagado;12/12/2024;PSE;PSE11223344;0;15000;Pago en l�nea con cobro especial;Admin;12/12/2024;comprobantes/PAG002.pdf
+PAG003;INM003;T2;A305;3;Carlos Rueda;8492752;1/03/2025;220000;Mora;;Transferencia;;5000;;Pendiente de pago;Admin;;
+PAG004;INM004;T1;A105;4;Ana Beltr�n;123985858;1/04/2025;270000;Mora;;;Efectivo;;;Registro en ventanilla;Admin;;
+;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;
+;;;;;;;;;;;;;;;;;;
+MP-147463252468;Mz 3 Casa 11;Mz 3;Casa 11;;Nancy Mateus;3137896508;2026-02;75000;Pagado;23/02/2026;debvisa;147000000000;0;0;Pago en línea confirmado manualmente;Administración;23/02/2026;
+MP-147467743534;Mz 3 Casa 11;Mz 3;Casa 11;;Nancy Mateus;3137896508;2026-02;75000;Pagado;23/02/2026;debvisa;147000000000;0;0;Pago en línea confirmado manualmente;Administración;23/02/2026;
+;;;;;;;;;;;;;;;;;;
+MP-147473219096;Torre 5 Apto 301;Torre 5;Apto 301;;Isabel Santacoloma;3137896508;2026-02;250000;Pagado;23/02/2026;debvisa;147473219096;0;0;Pago en línea confirmado manualmente;Administración;23/02/2026;
+
+MP-148478886829;Torre 5 Apto 301;Torre 5;Apto 301;;Nancy Mateus;3137896508;2026-03;55000;Pagado;2026-03-06;debvisa;'148478886829';0;0;Pago en línea confirmado manualmente;Administración;2026-03-06;
+MP-148495356703;Torre 12 Apto 301;Torre 12;Apto 301;;Nancy Mateus;3132865198;2026-03;35000;Pagado;2026-03-06;debvisa;'148495356703';0;0;Pago en línea confirmado manualmente;Administración;2026-03-06;
+MP-148568246847;Mz 12 Casa 11;Mz 12;Casa 11;;Nancy Mateus;3137896508;2026-03;55000;Pagado;2026-03-07;debvisa;'148568246847';0;0;Pago en línea confirmado manualmente;Administración;2026-03-07;
+MP-149295877692;Mz 12 Casa 11;Mz 12;Casa 11;;Nancy Mateus;3137896508;2026-03;45000;Pagado;2026-03-07;debvisa;'149295877692';0;0;Pago en línea confirmado manualmente;Administración;2026-03-07;
+MP-148587811739;Torre 12 Apto 301;Torre 12;Apto 301;;William Mateus;3132865198;2026-03;75000;Pagado;2026-03-07;debvisa;'148587811739';0;0;Pago en línea confirmado manualmente;Administración;2026-03-07;
+MP-148588476115;Torre 5 Apto 301;Torre 5;Apto 301;;Javier Mateus;3137896508;2026-03;100000;Pagado;2026-03-07;debvisa;'148588476115';0;0;Pago en línea confirmado manualmente;Administración;2026-03-07;
+MP-149309215994;Torre 5 Apto 301;Torre 5;Apto 301;;Javier Mateus;3128765398;2026-03;cuota_administracion;123000;Pagado;2026-03-07;debvisa;'149309215994';0;0;Pago en línea confirmado manualmente;Administración;2026-03-07;
+MP-149315999218;Torre 5 Apto 301;Torre 5;Apto 301;;Isabel Santacoloma;3137896508;2026-03;servicios_comunes;55000;Pagado;2026-03-07;debvisa;'149315999218';0;0;Pago en línea confirmado manualmente;Administración;2026-03-07;
+MP-149461495157;Mz 3 Casa 11;Mz 3;Casa 11;;Nancy Mateus;3137896508;2026-03;cuota_administracion;123000;Pagado;2026-03-13;debvisa;'149461495157';0;0;Pago en línea confirmado manualmente;Administración;2026-03-13;
+MP-149471098833;Torre 5 Apto 301;Torre 5;Apto 301;;Isabel Santacoloma;3137896508;2026-03;multa;87000;Pagado;2026-03-13;debvisa;'149471098833';0;0;Pago en línea confirmado manualmente;Administración;2026-03-13;

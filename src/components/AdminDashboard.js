@@ -1,28 +1,62 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import * as XLSX from "xlsx";
-import NotificacionesPanel from "./NotificacionesPanel";
 import TablaImportada from "./TablaImportada";
+import NotificacionesInforme from "./NotificacionesInforme";
+import BotonImportacion from "./BotonImportacion";
+import PQRSAdmin from "./PQRSAdmin";
+import { API_BASE } from "../config";
 
 // Componente para las tarjetas del dashboard
-function DashboardCard({ icon, valor, titulo, onClick, clickable }) {
+function DashboardCard({ icon, valor, titulo, onClick, clickable, resaltado, ancho }) {
+  const baseBorder = clickable ? "2px solid #2563eb" : "none";
+
   return (
     <div
       style={{
         width: "170px",
-        background: "#fafbfe",
+        background: resaltado ? "#fff7ed" : "#fafbfe",
         borderRadius: "18px",
-        boxShadow: "0 4px 18px #c2d6e130",
+        boxShadow: resaltado
+          ? "0 0 0 2px #f97316, 0 4px 18px #c2d6e130"
+          : "0 4px 18px #c2d6e130",
         padding: "0.8em 0.5em",
         textAlign: "center",
         cursor: clickable ? "pointer" : "default",
-        border: clickable ? "2px solid #2563eb" : "none",
+        border: baseBorder,
         marginBottom: 0,
+        transition: "all 0.15s ease-out",
       }}
       onClick={clickable ? onClick : undefined}
     >
-      <div style={{ fontSize: "2.1em", marginBottom: "0em" }}>{icon}</div>
-      <div style={{ fontSize: "2.0em", fontWeight: "bold" }}>{valor}</div>
-      <div style={{ fontSize: "0.97em", color: "#888" }}>{titulo}</div>
+      <div
+        style={{
+          fontSize: "2.1em",
+          marginBottom: "0em",
+          filter: resaltado ? "drop-shadow(0 0 4px #fb923c)" : "none",
+        }}
+      >
+        {icon}
+      </div>
+      <div
+        style={{
+                    fontSize: String(valor).length > 12 ? "1.6em" : "2.0em",
+          whiteSpace: "nowrap",
+          fontWeight: "bold",
+          color: resaltado ? "#ea580c" : "#111827",
+        }}
+      >
+        {valor}
+      </div>
+      <div
+  style={{
+    fontSize: "0.98em",
+    color: resaltado ? "#9a3412" : "#334155",
+    fontWeight: resaltado ? "700" : "700",
+    letterSpacing: "0.4px",
+  }}
+>
+  {titulo}
+</div>
     </div>
   );
 }
@@ -31,565 +65,443 @@ function DashboardCard({ icon, valor, titulo, onClick, clickable }) {
 function AdminDashboard({
   usuario,
   setUsuario,
-  residentes = [],
-  apartamentos = [],
+  habitantes = [],
+  inmuebles = [],
   pagos = [],
   reservas = [],
   mantenimiento = [],
   incidentes = [],
   parqueaderos = [],
   vehiculos = [],
+  handleImportacion,
+  onAbrirNotificaciones,
 }) {
-  // Estados
+  // ===== ESTADOS =====
   const [modalNotif, setModalNotif] = useState(false);
-  const [datosImportados, setDatosImportados] = useState({
-    residentes: residentes,
-    apartamentos: apartamentos,
-    pagos: pagos,
-    reservas: reservas,
-    mantenimiento: mantenimiento,
-    incidentes: incidentes,
-    parqueaderos: parqueaderos,
-  });
-  const [notificacionesImportadas, setNotificacionesImportadas] = useState([]);
+  const [notificacionesDashboard, setNotificacionesDashboard] = useState([]);
   const [moduloActivo, setModuloActivo] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
+  const [nuevasNotificaciones, setNuevasNotificaciones] = useState(0);
+  const [totalNotificaciones, setTotalNotificaciones] = useState(0);
+  const [mostrarPQRS, setMostrarPQRS] = useState(false);
 
-  // Calcular morosidad
-  const pagosEnMora = datosImportados.pagos.filter(
-    (p) => ((p.estado || p.Estado) || "").toLowerCase().includes("mora")
-  );
-  const morosidadPorcentaje =
-    datosImportados.pagos.length > 0
-      ? ((pagosEnMora.length / datosImportados.pagos.length) * 100).toFixed(1) +
-        "%"
-      : "0%";
-
-  // Función para importar archivos CSV
-  const handleImportarCSV = (tipoModulo) => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".csv,.xlsx";
-    input.onchange = (e) => {
-      const archivo = e.target.files[0];
-      if (!archivo) return;
-
-      const reader = new FileReader();
-      reader.readAsText(archivo, "UTF-8");
-      reader.onload = (evt) => {
-        try {
-          const contenido = evt.target.result;
-          const workbook = XLSX.read(contenido, { type: "string" });
-          const nombreHoja = workbook.SheetNames[0];
-          const hoja = workbook.Sheets[nombreHoja];
-          const datos = XLSX.utils.sheet_to_json(hoja, { defval: "" });
-
-          setDatosImportados((prev) => ({
-            ...prev,
-            [tipoModulo]: datos,
-          }));
-          alert(`✅ ${tipoModulo} importados correctamente: ${datos.length} registros`);
-        } catch (error) {
-          alert(`❌ Error al importar: ${error.message}`);
-        }
-      };
-    };
-    input.click();
-  };
-
-  // Función para importar notificaciones
-  const handleImportarNotificaciones = (e) => {
-    const archivo = e.target.files[0];
-    if (!archivo) return;
-
-    const reader = new FileReader();
-    reader.readAsText(archivo, "UTF-8");
-    reader.onload = (evt) => {
+  // ===== useEffect 1: total notificaciones (backend) =====
+  useEffect(() => {
+    const fetchConteoNotificaciones = async () => {
       try {
-        const contenido = evt.target.result;
-        const workbook = XLSX.read(contenido, { type: "string" });
-        const nombreHoja = workbook.SheetNames[0];
-        const hoja = workbook.Sheets[nombreHoja];
-        const datos = XLSX.utils.sheet_to_json(hoja, { defval: "" });
-        setNotificacionesImportadas(datos);
-        alert(`✅ Notificaciones importadas: ${datos.length} registros`);
-      } catch (error) {
-        alert(`❌ Error al importar: ${error.message}`);
+        const resp = await fetch("http://localhost:4000/api/notificaciones");
+        const data = await resp.json();
+        setTotalNotificaciones(Array.isArray(data) ? data.length : 0);
+      } catch (err) {
+        console.error("Error obteniendo conteo de notificaciones", err);
+        setTotalNotificaciones(0);
       }
     };
+
+    fetchConteoNotificaciones();
+  }, []);
+
+  // ===== useEffect 2: nuevas notificaciones =====
+  useEffect(() => {
+    const clave = "ultimaVisitaNotificaciones";
+    const ultimaVisita = localStorage.getItem(clave);
+
+    if (!ultimaVisita) {
+      localStorage.setItem(clave, Date.now().toString());
+      setNuevasNotificaciones(0);
+      return;
+    }
+
+    const ultima = parseInt(ultimaVisita, 10);
+    if (isNaN(ultima)) {
+      setNuevasNotificaciones(0);
+      return;
+    }
+
+    const nuevas = notificacionesDashboard.filter((n) => {
+      if (!n.fecha && !n.Fecha) return false;
+      const valorFecha = n.fecha || n.Fecha;
+      const partes = String(valorFecha).split("-");
+      if (partes.length !== 3) return false;
+      const fechaNotif = new Date(
+        parseInt(partes[0], 10),
+        parseInt(partes[1], 10) - 1,
+        parseInt(partes[2], 10)
+      );
+      return fechaNotif.getTime() >= ultima;
+    }).length;
+
+    setNuevasNotificaciones(nuevas);
+  }, [notificacionesDashboard]);
+
+  // ===== funciones =====
+  const abrirNotificaciones = () => {
+  const clave = "ultimaVisitaNotificaciones";
+
+  if (!modalNotif) {
+    localStorage.setItem(clave, Date.now().toString());
+    setNuevasNotificaciones(0);
+  }
+
+  setModalNotif((prev) => !prev);
+};
+
+          // ===== Incidentes reales: bitácora de seguridad + incidentes reportados por residentes (PQRS) =====
+  const [bitacora, setBitacora] = useState([]);
+  const [pqrsIncidentes, setPqrsIncidentes] = useState([]);
+
+  useEffect(() => {
+    let vigente = true;
+    const cargarIncidentes = async () => {
+      try {
+        const [datosBitacora, datosPqrs] = await Promise.all([
+          fetch(`${API_BASE}/api/bitacora`).then((r) => r.json()).catch(() => ({})),
+          fetch(`${API_BASE}/api/pqrs`).then((r) => r.json()).catch(() => []),
+        ]);
+        if (!vigente) return;
+        setBitacora(Array.isArray(datosBitacora.novedades) ? datosBitacora.novedades : []);
+        setPqrsIncidentes(
+          Array.isArray(datosPqrs) ? datosPqrs.filter((p) => String(p.Tipo || "").trim() === "Incidente") : []
+        );
+      } catch (err) {
+        console.error("Error obteniendo los incidentes", err);
+      }
+    };
+    cargarIncidentes();
+    const timer = setInterval(cargarIncidentes, 30000);
+    return () => { vigente = false; clearInterval(timer); };
+  }, []);
+
+  // La tarjeta suma tres fuentes: todas las novedades de la bitácora, los incidentes que
+  // reportan los residentes en Solicitudes/PQRS y los incidentes importados (como antes).
+  const mesActual = new Date().toLocaleDateString("en-CA", { timeZone: "America/Bogota" }).slice(0, 7);
+  const enElMes = (fecha) => String(fecha || "").startsWith(mesActual);
+  const novedadesDelMes = bitacora.filter((n) => enElMes(n.Fecha)).length;
+  const pqrsIncidentesDelMes = pqrsIncidentes.filter((p) => enElMes(p.Fecha)).length;
+  const abiertasBitacora = bitacora.filter((n) => n.Estado === "abierta").length;
+  const abiertasPqrs = pqrsIncidentes.filter((p) =>
+    ["radicada", "en proceso"].includes(String(p.Estado || "").trim().toLowerCase())
+  ).length;
+  const incidentesAbiertos = abiertasBitacora + abiertasPqrs;
+  const totalIncidentes = novedadesDelMes + pqrsIncidentesDelMes + incidentes.length;
+
+  // Abre la bitácora de seguridad (el administrador puede atender las novedades ahí).
+  const abrirBitacora = () => setUsuario({ ...usuario, rolActivo: "Seguridad", vistaInicial: "bitacora" });
+
+    // ===== Vehículos y parqueaderos guardados en el servidor =====
+  const [resumenInv, setResumenInv] = useState({ vehiculos: 0, parqueaderos: 0, manejaParqueaderos: false });
+
+  useEffect(() => {
+    let vigente = true;
+    const cargarResumen = async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/inventario/resumen`);
+        const data = await resp.json();
+        if (vigente && resp.ok) setResumenInv(data);
+      } catch (err) {
+        console.error("Error obteniendo vehículos y parqueaderos", err);
+      }
+    };
+    cargarResumen();
+    const timer = setInterval(cargarResumen, 30000);
+    window.addEventListener("inventario-actualizado", cargarResumen);
+    return () => {
+      vigente = false;
+      clearInterval(timer);
+      window.removeEventListener("inventario-actualizado", cargarResumen);
+    };
+  }, []);
+
+    // ===== Morosidad real, calculada desde la cartera =====
+  const [moraResumen, setMoraResumen] = useState(null);
+  useEffect(() => {
+    let vigente = true;
+    const cargarMora = async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/pagos-recibidos/resumen-mora`);
+        const data = await resp.json();
+        if (vigente && resp.ok && data.ok) setMoraResumen(data);
+      } catch (err) {
+        console.error("Error obteniendo la morosidad", err);
+      }
+    };
+    cargarMora();
+    const timer = setInterval(cargarMora, 30000);
+    window.addEventListener("cartera-actualizada", cargarMora);
+    return () => {
+      vigente = false;
+      clearInterval(timer);
+      window.removeEventListener("cartera-actualizada", cargarMora);
+    };
+  }, []);
+
+     // ===== Habitantes e inmuebles, contados con el mismo criterio de la generación de cuotas =====
+  // Habitantes = residentes activos. El administrador, el personal de seguridad y el de mantenimiento
+  // no viven en un inmueble y no cuentan; tampoco quienes ya salieron del conjunto.
+  // Inmuebles = ubicaciones (torre y apartamento) distintas donde vive algún residente activo.
+  const claveFechaHab = (valor) => {
+    const t = String(valor || "").trim();
+    let m = t.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
+    if (m) return Number(m[1]) * 10000 + Number(m[2]) * 100 + Number(m[3]);
+    m = t.match(/^(\d{1,2})[-/](\d{1,2})[-/](\d{4})/);
+    if (m) return Number(m[3]) * 10000 + Number(m[2]) * 100 + Number(m[1]);
+    return 0;
   };
-
-  // Datos ficticios para DEMO
-  const datosDemo = {
-    residentes: [
-      { "ID Habitante": 1, Nombre: "Juan Pérez", Apartamento: "101", Telefono: "3001234567" },
-      { "ID Habitante": 2, Nombre: "María García", Apartamento: "102", Telefono: "3007654321" },
-      { "ID Habitante": 3, Nombre: "Carlos López", Apartamento: "103", Telefono: "3009876543" },
-    ],
-    apartamentos: [
-      { ID: "101", Torre: "A", Bloque: "1", Piso: 1, Area: "95m²" },
-      { ID: "102", Torre: "B", Bloque: "1", Piso: 1, Area: "110m²" },
-      { ID: "103", Torre: "A", Bloque: "2", Piso: 2, Area: "120m²" },
-    ],
-    pagos: [
-      { ID: 1, Habitante: "Juan Pérez", Monto: "$500.000", Estado: "Pagado", Fecha: "2025-01-15" },
-      { ID: 2, Habitante: "María García", Monto: "$500.000", Estado: "Mora", Fecha: "2025-01-20" },
-      { ID: 3, Habitante: "Carlos López", Monto: "$500.000", Estado: "Pagado", Fecha: "2025-01-18" },
-    ],
-    reservas: [
-      { ID: 1, Solicitante: "Juan Pérez", Salon: "Sala Comunal", Fecha: "2025-02-10", Hora: "14:00" },
-      { ID: 2, Solicitante: "María García", Salon: "Cancha", Fecha: "2025-02-12", Hora: "10:00" },
-    ],
-    mantenimiento: [
-      { ID: 1, Tipo: "Reparación", Ubicación: "Piscina", Estado: "En Progreso", Fecha: "2025-01-22" },
-      { ID: 2, Tipo: "Limpieza", Ubicación: "Pasillos", Estado: "Completado", Fecha: "2025-01-25" },
-    ],
-    incidentes: [
-      { ID: 1, Tipo: "Ruido", Apartamento: "101", Reportado: "2025-01-20", Estado: "Resuelto" },
-      { ID: 2, Tipo: "Mascota", Apartamento: "102", Reportado: "2025-01-22", Estado: "Pendiente" },
-    ],
-    parqueaderos: [
-      { ID: "P-01", Estado: "Ocupado", Residente: "Juan Pérez", Placa: "ABC123" },
-      { ID: "P-02", Estado: "Disponible", Residente: "-", Placa: "-" },
-      { ID: "P-03", Estado: "Ocupado", Residente: "María García", Placa: "XYZ789" },
-    ],
+  const sinTildes = (v) => String(v ?? "").normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
+  const claveUbicacion = (torre, apto) => {
+    const t = sinTildes(torre).replace(/\s+/g, "").replace(/^(torre)/, "t").replace(/^(manzana|mza|mz)/, "m").replace(/-/g, "");
+    const a = sinTildes(apto).replace(/\s+/g, "").replace(/^0+(?=\d)/, "");
+    return `${t}|${a}`;
   };
+  const hoyHab = claveFechaHab(new Date().toLocaleDateString("en-CA", { timeZone: "America/Bogota" }));
+  const listaResidentes = (Array.isArray(habitantes) ? habitantes : []).filter((h) => {
+    if (String(h.Rol || h.rol || "").trim().toLowerCase() !== "residente") return false;
+    const salida = claveFechaHab(h.FechaSalida || h.fechaSalida);
+    return !salida || salida > hoyHab;
+  });
+  const residentesActivos = listaResidentes.length;
+  const inmueblesActivos = new Set(
+    listaResidentes.filter((h) => h.TorreManzana && h.AptoCasa).map((h) => claveUbicacion(h.TorreManzana, h.AptoCasa))
+  ).size;
 
-  // Función para cargar datos de DEMO
-  const cargarDatosDemo = () => {
-    setDatosImportados(datosDemo);
-    alert("✅ Datos de DEMO cargados correctamente");
-  };
+    // ===== Mantenimiento real: tareas abiertas y urgentes =====
+  const [mantResumen, setMantResumen] = useState(null);
+  useEffect(() => {
+    let vigente = true;
+    const cargarMant = async () => {
+      try {
+        const resp = await fetch(`${API_BASE}/api/mantenimiento/resumen`);
+        const data = await resp.json();
+        if (vigente && resp.ok && data.ok) setMantResumen(data);
+      } catch (err) {
+        console.error("Error obteniendo el mantenimiento", err);
+      }
+    };
+    cargarMant();
+    const timer = setInterval(cargarMant, 30000);
+    return () => { vigente = false; clearInterval(timer); };
+  }, []);
 
-  // Filtrar datos según búsqueda
-  const datosModuloActivo = moduloActivo
-    ? datosImportados[moduloActivo]?.filter((item) =>
-        Object.values(item).some((val) =>
-          String(val).toLowerCase().includes(searchTerm.toLowerCase())
-        )
-      ) || []
-    : [];
-
+  // ===== return ÚNICO DEL COMPONENTE =====
   return (
-    <div style={{ padding: "20px", backgroundColor: "#f5f7fa", minHeight: "100vh" }}>
-      {/* Botón Regresar */}
-      <button
-        onClick={() => setUsuario(null)}
-        style={{
-          background: "#218290",
-          color: "#fff",
-          padding: "10px 18px 10px 14px",
-          borderRadius: "16px",
-          border: "none",
-          fontWeight: "bold",
-          fontSize: "1em",
-          boxShadow: "0 2px 10px #c2d6e1",
-          cursor: "pointer",
-          display: "flex",
-          alignItems: "center",
-          gap: "8px",
-          marginBottom: "20px",
-        }}
-        title="Regresar"
-      >
-        ← Regresar
-      </button>
-
-      {/* Tarjetas resumen */}
-      <div style={{ display: "flex", gap: "12px", marginBottom: "30px", flexWrap: "wrap" }}>
-        <DashboardCard
-          icon="📢"
-          valor={notificacionesImportadas.length}
-          titulo="NOTIFICACIONES"
-          onClick={() => setModalNotif(true)}
-          clickable
-        />
-        <DashboardCard
-          icon="👥"
-          valor={datosImportados.residentes.length}
-          titulo="HABITANTES"
-          onClick={() => setModuloActivo("residentes")}
-          clickable
-        />
-        <DashboardCard
-          icon="⚠️"
-          valor={morosidadPorcentaje}
-          titulo="MOROSIDAD"
-          onClick={() => setModuloActivo("morosidad")}
-          clickable
-        />
-        <DashboardCard
-          icon="🗓️"
-          valor={datosImportados.reservas.length}
-          titulo="RESERVAS"
-          onClick={() => setModuloActivo("reservas")}
-          clickable
-        />
-        <DashboardCard
-          icon="🔧"
-          valor={datosImportados.mantenimiento.length}
-          titulo="MANTENIMIENTO"
-          onClick={() => setModuloActivo("mantenimiento")}
-          clickable
-        />
-        <DashboardCard
-          icon="🚨"
-          valor={datosImportados.incidentes.length}
-          titulo="INCIDENTES DEL MES"
-          onClick={() => setModuloActivo("incidentes")}
-          clickable
-        />
-        <DashboardCard
-          icon="💳"
-          valor={datosImportados.pagos.length}
-          titulo="PAGOS"
-          onClick={() => setModuloActivo("pagos")}
-          clickable
-          />
-          <DashboardCard
-          icon="🅿️"
-          valor={datosImportados.parqueaderos.length}
-          titulo="PARQUEADEROS"
-          onClick={() => setModuloActivo("parqueaderos")}
-          clickable
-          />
-      </div>
-
-      {/* Modal de Notificaciones */}
-      {modalNotif && (
-        <NotificacionesPanel
-          datos={notificacionesImportadas}
-          onClose={() => setModalNotif(false)}
-        />
-      )}
-
-      {/* Barra de búsqueda */}
-      <div style={{ marginBottom: "20px", display: "flex", gap: "10px" }}>
-        <input
-          type="text"
-          placeholder="🔍 Buscar en los datos..."
-          value={searchTerm}
-          onChange={(e) => setSearchTerm(e.target.value)}
-          style={{
-            padding: "10px 15px",
-            borderRadius: "8px",
-            border: "1px solid #ddd",
-            width: "300px",
-            fontSize: "1em",
-          }}
-        />
-      </div>
-
-      {/* Bloque de botones de importación */}
+    <div style={{ position: "relative", width: "100%" }}>
+      {/* Tarjetas resumen arriba - CENTRADAS */}
       <div
         style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(4, 1fr)",
-          gap: "1.2em",
+          display: "flex",
+          gap: "16px",
+          alignItems: "stretch",
+          marginBottom: "24px",
           justifyContent: "center",
-          maxWidth: "900",
-          margin: "0 auto",
-          marginTop: "60",
+          flexWrap: "wrap",
         }}
       >
-        {/* Botón Cargar Demo */}
-        <button
-          onClick={cargarDatosDemo}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#10b981",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #10b98133",
-            transition: "transform 0.2s",
-          }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          ⭐ Cargar DEMO
-        </button>
+       <DashboardCard
+  icon="📢"
+  valor={modalNotif ? "Abierto" : "Ver"}
+  titulo={
+    nuevasNotificaciones > 0
+      ? `NOTIFICACIONES (${nuevasNotificaciones} nuevas)`
+      : `NOTIFICACIONES (${totalNotificaciones})`
+  }
+  onClick={abrirNotificaciones}
+  clickable
+  resaltado={modalNotif}
+/>
 
-        {/* Botón Importar Habitantes */}
-        <button
-          onClick={() => handleImportarCSV("residentes")}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#3b82f6",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #3b82f633",
-            transition: "transform 0.2s",
-          }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          👥 Importar Habitantes
-        </button>
+        <DashboardCard
+  icon="🔔"
+  valor={mostrarPQRS ? "Abierto" : "Ver"}
+  titulo="PQRS"
+  onClick={() => setMostrarPQRS((prev) => !prev)}
+  clickable
+  resaltado={mostrarPQRS}
+/>
+        <DashboardCard
+          icon="👥"
+          valor={residentesActivos}
+          titulo="HABITANTES"
+        />
 
-        {/* Botón Importar Inmuebles */}
-        <button
-          onClick={() => handleImportarCSV("apartamentos")}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#8b5cf6",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #8b5cf633",
-            transition: "transform 0.2s",
-          }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          🏠 Importar Inmuebles
-        </button>
+        <DashboardCard
+          icon="🏢"
+          valor={inmueblesActivos}
+          titulo="INMUEBLES"
+        />
 
-        {/* Botón Importar Pagos */}
-        <button
-          onClick={() => handleImportarCSV("pagos")}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#ec4899",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #ec489933",
-                      }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          💳 Importar Pagos
-        </button>
+                <DashboardCard icon="🚗" valor={resumenInv.vehiculos} titulo="VEHÍCULOS" />
 
-        {/* Botón Importar Reservas */}
-        <button
-          onClick={() => handleImportarCSV("reservas del mes")}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#06b6d4",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #06b6d433",
-            transition: "transform 0.2s",
-          }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          🗓️ Importar Reservas del mes
-        </button>
+                {resumenInv.manejaParqueaderos && (
+          <DashboardCard icon="🅿️" valor={resumenInv.parqueaderos} titulo="PARQUEADEROS" />
+        )}
 
-        {/* Botón Importar Mantenimiento */}
-        <button
-          onClick={() => handleImportarCSV("mantenimiento")}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#f59e0b",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #f59e0b33",
-            transition: "transform 0.2s",
-          }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          🔧 Importar Mantenimiento
-        </button>
+                <DashboardCard
+          icon="📊"
+          ancho="240px"
+          valor={moraResumen ? `$${Number(moraResumen.totalMora || 0).toLocaleString("es-CO")}` : "..."}
+          titulo={
+            moraResumen
+              ? `CARTERA EN MORA (${moraResumen.inmueblesEnMora} ${moraResumen.inmueblesEnMora === 1 ? "inmueble" : "inmuebles"})`
+              : "CARTERA EN MORA"
+          }
+        />
+        
+          <DashboardCard
+          icon="🛠️"
+          valor={mantResumen ? mantResumen.abiertas : "..."}
+          titulo={mantResumen && mantResumen.urgentes > 0 ? `MANTENIMIENTO (${mantResumen.urgentes} urgentes)` : "MANTENIMIENTO"}
+          resaltado={Boolean(mantResumen && mantResumen.urgentes > 0)}
+          onClick={() => setUsuario({ ...usuario, rolActivo: "Mantenimiento" })}
+          clickable
+        />
 
-        {/* Botón Importar Incidentes */}
-        <button
-          onClick={() => handleImportarCSV("incidentes")}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#ef4444",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #ef444433",
-            transition: "transform 0.2s",
-          }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          🚨 Importar Incidentes
-        </button>
+        <DashboardCard
+          icon="⚠️"
+                    valor={totalIncidentes}
+          titulo={incidentesAbiertos > 0 ? `INCIDENTES DEL MES (${incidentesAbiertos} abiertos)` : "INCIDENTES DEL MES"}
+          onClick={abrirBitacora}
+          clickable
+        />
+      </div>
 
-        {/* Botón Importar Parqueaderos */}
-        <button
-          onClick={() => handleImportarCSV("parqueaderos")}
-          style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#8b5cf6",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
-            cursor: "pointer",
-            boxShadow: "0 4px 15px #8b5cf633",
-            transition: "transform 0.2s",
-          }}
-          onMouseOver={(e) => (e.target.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.target.style.transform = "scale(1)")}
-        >
-          🅿️ Importar Parqueaderos
-        </button>
+      {/* Tablas importadas (habitantes, inmuebles, pagos, etc.) */}
+      <div style={{ marginBottom: "24px" }}>
+        {moduloActivo && (
+          <TablaImportada
+            datos={
+              moduloActivo === "habitantes" ? habitantes :
+              moduloActivo === "inmuebles" ? inmuebles :
+              moduloActivo === "pagos" ? pagos :
+              moduloActivo === "reservas" ? reservas :
+              moduloActivo === "mantenimiento" ? mantenimiento :
+              moduloActivo === "incidentes" ? incidentes :
+              moduloActivo === "parqueaderos" ? parqueaderos :
+              moduloActivo === "vehiculos" ? vehiculos :
+              []
+            }
+            nombre={moduloActivo}
+            mostrar={moduloActivo !== null}
+            onOcultar={() => setModuloActivo(null)}
+          />
+        )}
 
-        {/* Botón Importar Notificaciones */}
-        <label
+        <div
           style={{
-            padding: "20px",
-            borderRadius: "12px",
-            border: "none",
-            backgroundColor: "#14b8a6",
-            color: "white",
-            fontSize: "1.1em",
-            fontWeight: "bold",
+            width: "170px",
+            background: "#1076a6ff",
+            borderRadius: "18px",
+            boxShadow: "0 4px 18px #c2d6e130",
+            padding: "0.8em 0.5em",
+            textAlign: "center",
             cursor: "pointer",
-            boxShadow: "0 4px 15px #14b8a633",
-            transition: "transform 0.2s",
+            border: "none",
+            marginBottom: 0,
+            transition: "all 0.15s ease-out",
             display: "flex",
             alignItems: "center",
             justifyContent: "center",
+            minHeight: "10px",
           }}
-          onMouseOver={(e) => (e.parentElement.style.transform = "scale(1.05)")}
-          onMouseOut={(e) => (e.parentElement.style.transform = "scale(1)")}
+          onClick={() => setUsuario(null)}
         >
-          📢 Importar Notificaciones
-          <input
-            type="file"
-            accept=".csv,.xlsx"
-            onChange={handleImportarNotificaciones}
-            style={{ display: "none" }}
-          />
-        </label>
-      </div>
-
-      {/* Tabla de datos importados */}
-      <div style={{ marginTop: "40px" }}>
-        {moduloActivo && (
           <div
             style={{
-              backgroundColor: "white",
-              borderRadius: "12px",
-              padding: "20px",
-              boxShadow: "0 4px 15px rgba(0,0,0,0.1)",
+              fontSize: "1.1em",
+              fontWeight: "bold",
+              color: "#eff3f3f9",
             }}
           >
-            <h2 style={{ marginTop: 0, color: "#333" }}>
-              Datos de {moduloActivo.toUpperCase()}
-              <button
-                onClick={() => setModuloActivo(null)}
-                style={{
-                  marginLeft: "10px",
-                  padding: "5px 10px",
-                  background: "#ef4444",
-                  color: "white",
-                  border: "none",
-                  borderRadius: "5px",
-                  cursor: "pointer",
-                }}
-              >
-                Cerrar
-              </button>
-            </h2>
-
-            {datosModuloActivo.length > 0 ? (
-              <div style={{ overflowX: "auto" }}>
-                <table
-                  style={{
-                    width: "100%",
-                    borderCollapse: "collapse",
-                    fontSize: "0.95em",
-                  }}
-                >
-                  <thead>
-                    <tr style={{ backgroundColor: "#f3f4f6", borderBottom: "2px solid #e5e7eb" }}>
-                      {Object.keys(datosModuloActivo[0]).map((key) => (
-                        <th
-                          key={key}
-                          style={{
-                            padding: "12px",
-                            textAlign: "left",
-                            fontWeight: "bold",
-                            color: "#374151",
-                          }}
-                        >
-                          {key}
-                        </th>
-                      ))}
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {datosModuloActivo.map((fila, idx) => (
-                      <tr
-                        key={idx}
-                        style={{
-                          borderBottom: "1px solid #e5e7eb",
-                          backgroundColor: idx % 2 === 0 ? "#f9fafb" : "white",
-                        }}
-                      >
-                        {Object.values(fila).map((valor, i) => (
-                          <td
-                            key={i}
-                            style={{
-                              padding: "12px",
-                              color: "#555",
-                            }}
-                          >
-                            {String(valor)}
-                          </td>
-                        ))}
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-              </div>
-            ) : (
-              <p style={{ color: "#999", textAlign: "center" }}>
-                No hay datos para mostrar. Importa un archivo CSV.
-              </p>
-            )}
+            REGRESAR
           </div>
-        )}
+        </div>
       </div>
 
-      {/* Mostrar tabla de notificaciones si hay datos */}
-      {notificacionesImportadas.length > 0 && (
-        <TablaImportada
-          datos={notificacionesImportadas}
-          nombre="notificaciones"
-          mostrar={notificacionesImportadas.length > 0}
-          onOcultar={() => setNotificacionesImportadas([])}
-        />
-      )}
+      {/* Panel de notificaciones con la tabla COMPLETA (nuevo informe) */}
+      {modalNotif && (
+  <div
+    style={{
+      background: "#ffffff",
+      borderRadius: "20px",
+      boxShadow: "0 8px 24px rgba(30, 41, 59, 0.08)",
+      padding: "1.2em",
+      marginTop: "12px",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "10px",
+        marginBottom: "12px",
+      }}
+    >
+      
+      <button
+        onClick={() => setModalNotif(false)}
+        style={{
+          padding: "0.65em 1.2em",
+          background: "#e2e8f0",
+          color: "#0f172a",
+          border: "none",
+          borderRadius: "10px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
+        Ocultar
+      </button>
+    </div>
+
+    <NotificacionesInforme
+      usuario={usuario}
+      onClose={() => setModalNotif(false)}
+    />
+  </div>
+)}
+     {mostrarPQRS && (
+  <div
+    style={{
+      background: "#ffffff",
+      borderRadius: "20px",
+      boxShadow: "0 8px 24px rgba(30, 41, 59, 0.08)",
+      padding: "1.2em",
+      marginTop: "12px",
+    }}
+  >
+    <div
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        flexWrap: "wrap",
+        gap: "10px",
+        marginBottom: "12px",
+      }}
+    >
+      
+      <button
+        onClick={() => setMostrarPQRS(false)}
+        style={{
+          padding: "0.65em 1.2em",
+          background: "#e2e8f0",
+          color: "#0f172a",
+          border: "none",
+          borderRadius: "10px",
+          cursor: "pointer",
+          fontWeight: "bold",
+        }}
+      >
+        Ocultar
+      </button>
+    </div>
+
+    <PQRSAdmin />
+  </div>
+)}
     </div>
   );
 }
 
 export default AdminDashboard;
-
