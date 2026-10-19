@@ -30,7 +30,9 @@ const app = express();
 /* =========================
    Rutas oficiales BaseResidencial
 ========================= */
-const baseResidencialDir = 'C:\\Users\\Javier Mateus\\Desktop\\Geincocer\\BaseResidencial';
+const baseResidencialDir = process.env.NODE_ENV === 'production' 
+  ? path.join(__dirname, '..', 'BaseResidencial') 
+  : 'C:\\Users\\Javier Mateus\\Desktop\\Geincocer\\BaseResidencial';
 const obligacionesController =
   crearObligacionesController(baseResidencialDir);
 const obligacionesRoutes =
