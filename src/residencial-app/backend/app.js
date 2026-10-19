@@ -102,10 +102,10 @@ app.use("/api/pqrs", pqrsRoutes);
 
 app.use(
   "/PQRSAdjuntos",
-  express.static(path.resolve("C:/Users/Javier Mateus/Desktop/Geincocer/BaseResidencial/PQRSAdjuntos"))
-)
+  express.static(path.join(baseResidencialDir, "PQRSAdjuntos"))
+);
 
-console.log("Ruta estática PQRSAdjuntos:", path.resolve("C:/Users/Javier Mateus/Desktop/Geincocer/BaseResidencial/PQRSAdjuntos"));
+console.log("Ruta estática PQRSAdjuntos:", path.join(baseResidencialDir, "PQRSAdjuntos"));
 
 /* =========================
    Configuración Multer
