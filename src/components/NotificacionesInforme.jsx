@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
 import * as XLSX from "xlsx";
+import { API_BASE } from "../config";
 
 // 🔹 Formato de fechas
 function formatoFecha(valor) {
@@ -112,7 +113,7 @@ function NotificacionesInforme({ usuario, onClose }) {
     try {
       setCargando(true);
       setError(null);
-      const resp = await axios.get("http://localhost:4000/api/notificaciones");
+      const resp = await axios.get("${API_BASE}/api/notificaciones");
       const data = Array.isArray(resp.data) ? resp.data : [];
       
       // Asignar ID temporal a notificaciones sin ID
@@ -255,7 +256,7 @@ const pendientes = notificaciones.filter((n) =>
 
         try {
           const uploadResp = await axios.post(
-            "http://localhost:4000/api/notificaciones/upload",
+            "${API_BASE}/api/notificaciones/upload",
             formData,
             { headers: { "Content-Type": "multipart/form-data" } }
           );
@@ -294,7 +295,7 @@ const pendientes = notificaciones.filter((n) =>
       };
 
       const resp = await axios.post(
-        "http://localhost:4000/api/notificaciones",
+        "${API_BASE}/api/notificaciones",
         nuevaNotif
       );
 
@@ -331,7 +332,7 @@ const pendientes = notificaciones.filter((n) =>
 
   try {
     if (!esTemporal) {
-      await axios.delete(`http://localhost:4000/api/notificaciones/${id}`);
+      await axios.delete(`${API_BASE}/api/notificaciones/${id}`);
     }
 
     setNotificaciones((prev) =>
@@ -1085,8 +1086,8 @@ const notificacionesOrdenadas = [...notificacionesFiltradas].sort((a, b) => {
                       <a
                         href={
                           n.URL_Archivo && n.URL_Archivo !== "-"
-                            ? `http://localhost:4000${n.URL_Archivo}`
-                            : `http://localhost:4000/Notificaciones/${encodeURIComponent(n.Adjunto)}`
+                            ? `${API_BASE}${n.URL_Archivo}`
+                            : `${API_BASE}/Notificaciones/${encodeURIComponent(n.Adjunto)}`
                         }
                         target="_blank"
                         rel="noopener noreferrer"
@@ -1103,8 +1104,8 @@ const notificacionesOrdenadas = [...notificacionesFiltradas].sort((a, b) => {
                       <a
                         href={
                           n.URL_Archivo && n.URL_Archivo !== "-"
-                            ? `http://localhost:4000${n.URL_Archivo}`
-                            : `http://localhost:4000/Notificaciones/${encodeURIComponent(n.Adjunto)}`
+                            ? `${API_BASE}${n.URL_Archivo}`
+                            : `${API_BASE}/Notificaciones/${encodeURIComponent(n.Adjunto)}`
                         }
                         download={n.Adjunto}
                         style={{

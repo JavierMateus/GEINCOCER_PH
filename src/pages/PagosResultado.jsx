@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
 import { useSearchParams, useNavigate } from 'react-router-dom';
+import { API_BASE } from "../config";
 
 const PagosResultado = () => {
   const [searchParams] = useSearchParams();
@@ -39,7 +40,7 @@ useEffect(() => {
   const procesarPagoExitoso = async (preferenceId, paymentId) => {
     setGuardando(true);
     try {
-      const response = await axios.post('http://localhost:4000/api/mercadopago/resultado', {
+      const response = await axios.post('${API_BASE}/api/mercadopago/resultado', {
         preferenceId,
         paymentId: paymentId || searchParams.get('payment_id')
       });

@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import { API_BASE } from "../config";
 
 const ConfirmarPagoMp = () => {
   const [paymentId, setPaymentId] = useState("");
@@ -22,7 +23,7 @@ const ConfirmarPagoMp = () => {
     setMensaje("");
     try {
       const resp = await axios.post(
-        "http://localhost:4000/api/mercadopago/confirmar",
+        `${API_BASE}/api/mercadopago/confirmar`,
         { paymentId: paymentId.trim() }
       );
 

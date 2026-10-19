@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 
-const API_BASE = "http://localhost:4000";
+import { API_BASE } from "../config";
 
 function PQRSAdmin() {
   const [pqrs, setPqrs] = useState([]);

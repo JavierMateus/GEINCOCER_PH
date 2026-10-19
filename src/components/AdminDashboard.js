@@ -5,6 +5,7 @@ import NotificacionesInforme from "./NotificacionesInforme";
 import BotonImportacion from "./BotonImportacion";
 import PQRSAdmin from "./PQRSAdmin";
 import { API_BASE } from "../config";
+import { API_BASE } from "../config";
 
 // Componente para las tarjetas del dashboard
 function DashboardCard({ icon, valor, titulo, onClick, clickable, resaltado, ancho }) {
@@ -89,7 +90,7 @@ function AdminDashboard({
   useEffect(() => {
     const fetchConteoNotificaciones = async () => {
       try {
-        const resp = await fetch("http://localhost:4000/api/notificaciones");
+        const resp = await fetch("${API_BASE}/api/notificaciones");
         const data = await resp.json();
         setTotalNotificaciones(Array.isArray(data) ? data.length : 0);
       } catch (err) {

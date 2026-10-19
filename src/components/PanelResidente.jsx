@@ -2286,7 +2286,7 @@ return (
           <td style={{ padding: "10px" }}>
   {item.URL_RespuestaAdmin && item.URL_RespuestaAdmin !== "-" ? (
     <a
-      href={`http://localhost:4000${item.URL_RespuestaAdmin}`}
+      href={`${API_BASE}${item.URL_RespuestaAdmin}`}
       target="_blank"
       rel="noopener noreferrer"
       style={{ color: "#0d6efd", textDecoration: "underline" }}
