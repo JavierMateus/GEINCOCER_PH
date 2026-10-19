@@ -1,0 +1,4 @@
+﻿ID_Tarea;Fecha;Hora;Titulo;Descripcion;Ubicacion;Prioridad;Estado;CreadaPor;FechaInicio;HoraInicio;IniciadaPor;FechaCierre;HoraCierre;CerradaPor
+TAR-1792159988255;2026-10-16;09:13;Reparar Moto Bomba de la Piscina;Llamar al técnico;Cuarto de Maquinas;Urgente;completada;Ana Gómez;2026-10-16;09:14;Ana Gómez;2026-10-16;09:16;Ana Gómez
+TAR-1792160322525;2026-10-16;09:18;Reparar reja cerca de la torre 7;;Reja Torre 7;Alta;cancelada;Ana Gómez;;;;2026-10-16;09:19;Ana Gómez
+TAR-1792160475464;2026-10-16;09:21;Podar arboles;Podar todos los arboles alrededor de la piscina;Piscina;Media;pendiente;Maria Lopez;;;;;;

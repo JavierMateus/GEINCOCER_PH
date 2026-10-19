@@ -1,0 +1,5 @@
+ID_Inmueble;Parqueadero1;Parqueadero2;Torre/Manzana;Apto/Casa;Telefono;Propietario;Documento_Propietario
+INM001;101A;101B;T1;A103;3101111111;Carlos Torres;987654321
+INM002;102B;;MzA;C9;3012345678;Ana Gómez;987654320
+INM003;S1;;T2;A305;3129876543;Laura Gómez;223344556
+INM004;PH2;PH3;M12;C17;;María López;444555666

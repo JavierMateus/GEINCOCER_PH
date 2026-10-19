@@ -1,0 +1,5 @@
+ID_Solicitud;ID_Inmueble;Torre/Manzana;Apto/Casa;Telefono;Fecha;Descripcion;Estado;Responsable;Prioridad
+SM001;INM001;T1;A103;3101111111;29/10/2025;Cambio bombillo;Pendiente;Juan Pérez;Alta
+SM002;INM002;MzA;C9;3012345678;29/10/2025;Reparación puerta;Resuelto;Ana Gómez;Media
+;INM003;T2;A305;3129876543;;;;;
+;INM004;;;;;;;;

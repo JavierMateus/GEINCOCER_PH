@@ -1,0 +1,6 @@
+ID;Fecha;Tipo;Asunto;Descripcion;Espacio;FechaReserva;HoraReserva;DocumentoResidente;NombreResidente;TorreManzana;AptoCasa;Estado;Adjunto;URL_Adjunto;RespuestaAdmin;URL_RespuestaAdmin;FechaRespuesta
+PQRS-1780088871181;2026-05-29;Petición;JGSDNOWKMK;KSGDLWGDPWLWDL;;;;21062014;Mariana Mateus;T2;302;Respondida;1780088871143-GEINCOCER_Presentacion.pdf;/PQRSAdjuntos/Solicitudes/1780088871143-GEINCOCER_Presentacion.pdf;ESTOY PROBANDO LA RESPUESTA A SU PQRS...... ESPERO SE PUEDA VER EN EL MODULO DE RESIDENTE;-;2026-06-04
+PQRS-1781205919062;2026-06-11;Reserva;PRUEBA BBQ;ASADO DIA DEL PADRE;;;;123456789;Juan Pérez;M7;C12;Respondida;-;-;AUTORIZADO;-;2026-10-05
+PQRS-1781210160135;2026-06-11;Reserva;ALQUILER BBQ;ALQUILER BBQ DIA NIÑO;;;;21062014;Mariana Mateus;T 2;APT 302;Radicada;-;-;-;-;-
+PQRS-1781215253689;2026-06-11;Reserva;ALQUILER;PARTIDO DE INTEGRACION CONJUNTO;CANCHA DE FUTBOL;2026-06-20;10:00;123456789;Juan Pérez;MZ 7;C 12;Respondida;-;-;SE AUTORIZA EL ALQUILER;-;2026-06-11
+PQRS-1781295616203;2026-06-12;Reserva;Alquiler;Para celebrar dia del padre;Salon Social;2026-06-27;16:00;21062014;Mariana Mateus;T 2;Apto 302;Radicada;-;-;-;-;-

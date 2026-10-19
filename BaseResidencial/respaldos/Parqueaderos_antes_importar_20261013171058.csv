@@ -1,0 +1,7 @@
+﻿ID_Parqueadero;Codigo;Tipo;ID_Inmueble;TorreManzana;AptoCasa
+PAR-001;101A;Residente;INM007;T-1;103
+PAR-002;101B;Residente;INM007;T-1;103
+PAR-003;102B;Residente;INM002;Mz1;C16
+PAR-004;S1;Residente;INM003;T2;A305
+PAR-005;PH2;Residente;INM004;M12;C17
+PAR-006;PH3;Residente;INM004;M12;C17

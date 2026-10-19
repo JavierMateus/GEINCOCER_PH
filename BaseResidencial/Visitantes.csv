@@ -1,0 +1,6 @@
+﻿ID_Visita;FechaEntrada;HoraEntrada;FechaSalida;HoraSalida;NombreVisitante;DocumentoVisitante;TorreManzana;AptoCasa;ResidenteVisitado;Motivo;Placa;Estado;RegistradoPor;SalidaRegistradaPor;Observaciones
+VIS-1791647388604;2026-10-10;10:49;2026-10-10;10:52;Gonzalo Romero;4769723;T 2;302;Maraina Mateus;Visita;INV138;salió;Carlos Torres;Carlos Torres;
+VIS-1791649417391;2026-10-10;11:23;2026-10-10;14:50;Claudia Rojas;653890;M-3;9;Jorge Vargas Martínez;Visita;;salió;Carlos Torres;Carlos Torres;
+VIS-1791649499810;2026-10-10;11:24;2026-10-10;16:41;Sergio Diaz;378012;M-5;20;Lucía Gutiérrez Gutiérrez;Visita;;salió;Ana Gómez;Carlos Torres;
+VIS-1791668436187;2026-10-10;16:40;2026-10-12;09:36;Leonardo Mateus;793658qo;M-7;12;Juan Pérez;Visita;;salió;Carlos Torres;Carlos Torres;
+VIS-1791820023190;2026-10-12;10:47;;;Rene Pinzon;3469820;T-1;104;Paula Rojas Ortiz;Visita;INV987;dentro;Carlos Torres;;

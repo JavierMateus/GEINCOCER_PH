@@ -1,0 +1,4 @@
+﻿ID_Vehiculo;Placa;Tipo;Marca;Color;ID_Inmueble;TorreManzana;AptoCasa;Estado
+VEH-001;XFG123;Carro;Renault;Blanco;INM007;T-1;103;activo
+VEH-002;HWK224;Moto;Yamaha;Negra;INM002;Mz1;C16;activo
+VEH-003;AGV765;Carro;Ford;Azul;INM003;T2;A305;activo

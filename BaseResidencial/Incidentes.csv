@@ -1,0 +1,5 @@
+ID_Incidente;ID_Inmueble;Torre/Manzana;Apto/Casa;Telefono;Tipo;Fecha;Descripcion;Estado;ID_Habitante;ID_Vivienda
+INC001;INM001;T1;A103;3101111111;Queja;15/10/2025;Ruido excesivo;Pendiente;1;101
+INC002;INM002;MzA;C9;3012345678;Daño;15/10/2025;Fuga de agua;Solucionado;4;103
+INC003;INM003;T2;A305;3129876543;Solicitud;20/10/2025;Reparación puerta;Abierto;3;102
+;INM004;;;;;;;;;

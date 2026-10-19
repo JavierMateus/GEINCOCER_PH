@@ -1,0 +1,5 @@
+ID_Vehículo;Placa;Tipo;Marca;Color;ID_Inmueble;Torre/Manzana;Apto/Casa;Telefono
+A1;XFG123;Carro;Renault;Blanco;INM001;T1;A103;3101111111
+A2;HWK224;Moto;Yamaha;Negra;INM002;MzA;C9;3012345678
+A3;AGV765;Carro;Ford;Azul;INM003;T2;A305;3129876543
+;;;;;INM004;;;

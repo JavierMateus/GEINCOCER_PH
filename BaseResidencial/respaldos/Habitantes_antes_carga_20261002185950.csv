@@ -1,0 +1,6 @@
+ID_Habitante;NombreResidente;DocumentoResidente;Rol;ID_Inmueble;TorreManzana;AptoCasa;Tipo;Telefono;Email;FechaEntrada;FechaSalida
+1;Juan Pérez;123456789;Residente;INM005;M-7;12;Propietario;3456890241;juanp@email.com;4/03/2026;
+2;Mariana Mateus;21062014;Residente;INM006;T-2;302;Propietario;3001234567;mariana@email.com;1/01/2025;
+3;Ana Gómez;987654321;Administrador;;;;;;;;
+4;Carlos Torres;567890123;Seguridad;;;;;;;;
+5;Maria Lopez;345678901;Mantenimiento;;;;;;;;

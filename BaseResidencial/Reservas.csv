@@ -1,0 +1,5 @@
+ID_Reserva;ID_Inmueble;Torre/Manzana;Apto/Casa;Telefono;Zona;Fecha;Hora Inicio;Hora Final
+R123;INM001;T1;A103;3101111111;Salón Social;28/10/2025;2:00 p. m.;8:00 p. m.
+R124;INM002;MzA;C9;3012345678;Parque infantil;29/10/2025;8:00 a. m.;12:00 a. m.
+R125;INM003;T2;A305;3129876543;BBQ;30/10/2025;3:00 p. m.;8:00 p. m.
+;INM004;;;;;31/10/2025;10:00 a. m.;2:00 p. m.

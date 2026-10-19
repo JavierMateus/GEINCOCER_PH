@@ -1,0 +1,47 @@
+﻿ID_Habitante;NombreResidente;DocumentoResidente;Rol;ID_Inmueble;TorreManzana;AptoCasa;Tipo;Telefono;Email;FechaEntrada;FechaSalida
+1;Juan Pérez;123456789;Residente;INM005;M-7;12;Propietario;3456890241;juanp@email.com;4/03/2026;
+2;Mariana Mateus;21062014;Residente;INM006;T-2;302;Propietario;3112934196;mariana.nuevo@email.com;1/01/2025;
+3;Ana Gómez;987654321;Administrador;;;;;;;;
+4;Carlos Torres;567890123;Seguridad;;;;;3202222222;carlos@email.com;;
+5;Maria Lopez;345678901;Mantenimiento;;;;;;;;
+6;Paula Rojas Ortiz;1113789020;Residente;INM007;T-1;103;Propietario;3178735513;paula.rojas@email.com;21/05/2026;
+7;Carolina Rojas García;1119583798;Residente;INM007;T-1;103;Familiar;3048137754;;21/05/2026;
+8;Ricardo Parra Quintero;1075698815;Residente;INM008;T-1;303;Arrendatario;3509690383;ricardo.parra@email.com;16/05/2026;
+9;Patricia Rodríguez Castillo;80224935;Residente;INM009;T-1;501;Propietario;3208885968;patricia.rodriguez@email.com;25/03/2022;
+10;Sebastián Suárez Sánchez;1095901695;Residente;INM010;T-1;502;Propietario;3186161129;sebastian.suarez@email.com;21/12/2025;
+11;Sofía Parra Gutiérrez;1027183296;Residente;INM011;T-1;504;Arrendatario;3141155640;sofia.parra@email.com;23/08/2025;
+12;Camila Parra López;1118385631;Residente;INM011;T-1;504;Familiar;3509212741;;23/08/2025;
+13;Natalia Ramírez Castro;68281295;Residente;INM012;T-1;403;Arrendatario;3156312624;natalia.ramirez@email.com;16/08/2026;
+14;Alejandro Parra Hernández;70789987;Residente;INM013;T-2;204;Propietario;3209038740;alejandro.parra@email.com;23/05/2026;
+15;Santiago Gutiérrez Castro;1019643929;Residente;INM014;T-2;502;Propietario;3002546333;santiago.gutierrez@email.com;12/02/2023;
+16;Andrés Ortiz Castillo;43264201;Residente;INM015;T-2;402;Arrendatario;3146993671;andres.ortiz@email.com;27/04/2026;
+17;Sebastián Ortiz Rodríguez;1089198595;Residente;INM015;T-2;402;Familiar;3104740105;;27/04/2026;
+18;Juliana Castillo López;21332433;Residente;INM016;T-2;404;Arrendatario;3106133900;juliana.castillo@email.com;23/09/2024;
+19;Ricardo Muñoz Jiménez;11896747;Residente;INM017;T-2;403;Propietario;3182232006;ricardo.munoz@email.com;17/04/2025;
+20;Camila Ospina Vargas;1063890916;Residente;INM018;T-2;104;Arrendatario;3158552102;camila.ospina@email.com;12/01/2022;
+21;Julián Hernández Suárez;30654844;Residente;INM019;T-3;101;Propietario;3206644171;julian.hernandez@email.com;19/10/2023;
+22;Alejandro Hernández Peña;41316553;Residente;INM019;T-3;101;Familiar;3181572987;;19/10/2023;
+23;Felipe Gutiérrez González;70642368;Residente;INM020;T-3;103;Propietario;3221343426;felipe.gutierrez@email.com;21/09/2022;
+24;Sebastián Gutiérrez Herrera;31527272;Residente;INM021;T-3;104;Propietario;3185576940;sebastian.gutierrez@email.com;26/09/2023;
+25;Carolina Medina Muñoz;1023447159;Residente;INM022;T-3;302;Propietario;3219348383;carolina.medina@email.com;13/05/2023;
+26;Iván Ospina Muñoz;1064700029;Residente;INM023;T-3;502;Propietario;3049845818;ivan.ospina@email.com;15/03/2024;
+27;Patricia Ospina Herrera;46753198;Residente;INM023;T-3;502;Familiar;3124881154;;15/03/2024;
+28;Andrés García Ortiz;13648678;Residente;INM024;T-3;204;Arrendatario;3174632979;andres.garcia@email.com;11/03/2026;
+29;Valentina Peña Cárdenas;1039553980;Residente;INM025;M-1;1;Propietario;3102702144;valentina.pena@email.com;18/10/2023;
+30;Patricia Castro Hernández;57815518;Residente;INM026;M-1;16;Propietario;3049499785;patricia.castro@email.com;6/02/2022;
+31;Julián Castro Castillo;45011808;Residente;INM027;M-1;11;Propietario;3007906212;julian.castro@email.com;10/06/2023;
+32;Claudia Castro Quintero;44499597;Residente;INM027;M-1;11;Familiar;3012618161;;10/06/2023;
+33;Laura Rodríguez Rojas;1104657182;Residente;INM028;M-3;7;Propietario;3017781192;laura.rodriguez@email.com;4/06/2026;
+34;Julián Peña Ramírez;1115601832;Residente;INM029;M-3;13;Arrendatario;3185896957;julian.pena@email.com;15/07/2022;
+35;Jorge Vargas Martínez;1093321670;Residente;INM030;M-3;9;Arrendatario;3153052109;jorge.vargas@email.com;23/07/2022;
+36;Paula Quintero Muñoz;36501061;Residente;INM031;M-5;12;Propietario;3043719991;paula.quintero@email.com;19/06/2026;
+37;Lucía Quintero Hernández;25875669;Residente;INM031;M-5;12;Familiar;3506939816;;19/06/2026;
+38;Lucía Gutiérrez Gutiérrez;1055740367;Residente;INM032;M-5;20;Propietario;3185014888;lucia.gutierrez@email.com;1/03/2026;
+39;Iván Muñoz Ríos;1003814081;Residente;INM033;M-5;13;Propietario;3143477715;ivan.munoz@email.com;25/03/2023;
+40;Laura Rodríguez Rodríguez;1128644866;Residente;INM034;M-7;17;Propietario;3102500668;laura.rodriguez@email.com;18/08/2025;
+41;Jorge González Medina;1084960701;Residente;INM035;M-7;3;Propietario;3011191416;jorge.gonzalez@email.com;21/09/2024;
+42;Germán González Sánchez;73155489;Residente;INM035;M-7;3;Familiar;3503530789;;21/09/2024;
+43;Ángela Beltrán Acosta;1111273513;Residente;INM036;M-7;11;Propietario;3164371874;angela.beltran@email.com;23/06/2023;
+44;Rodrigo Salazar Peña;1048198779;Residente;INM037;T-3;404;Arrendatario;3218953451;rodrigo.salazar@email.com;1/02/2024;31/07/2026
+45;Wilson Arévalo Rincón;87924088;Seguridad;;;;;3117887688;wilson.arevalo@email.com;15/01/2026;
+46;Laura Prueba Diaz;1122334455;Residente;INM038;T-3;305;Propietario;3109998877;;2/10/2026;2/10/2026

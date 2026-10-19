@@ -1,0 +1,4 @@
+﻿Parametro;Valor;Descripcion
+ValorCuotaApartamento;95000;Cuota mensual de administracion para inmuebles en torre (T-)
+ValorCuotaCasa;120000;Cuota mensual de administracion para casas en manzana (M-)
+DiaVencimiento;10;Dia del mes hasta el cual se paga sin mora
