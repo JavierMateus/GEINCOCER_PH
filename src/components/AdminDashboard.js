@@ -5,7 +5,6 @@ import NotificacionesInforme from "./NotificacionesInforme";
 import BotonImportacion from "./BotonImportacion";
 import PQRSAdmin from "./PQRSAdmin";
 import { API_BASE } from "../config";
-import { API_BASE } from "../config";
 
 // Componente para las tarjetas del dashboard
 function DashboardCard({ icon, valor, titulo, onClick, clickable, resaltado, ancho }) {
