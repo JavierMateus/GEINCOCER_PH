@@ -310,6 +310,14 @@ app.delete('/api/notificaciones/:id', (req, res) => {
   }
 });
 
+// 1. Indicarle a Express que sirva todos los archivos de la carpeta 'public'
+app.use(express.static(path.join(__dirname, 'public')));
+
+// 2. Capturar cualquier ruta y devolver el index.html de React
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
 /* =========================
    Arrancar servidor
 ========================= */
