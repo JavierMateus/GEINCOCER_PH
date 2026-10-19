@@ -160,7 +160,7 @@ const pagosMorosos = React.useMemo(() => {
     setError("");
   };
 
-  // Al cerrar sesion se borra lo escrito en el ingreso.
+    // Al cerrar sesion se borra lo escrito en el ingreso.
   useEffect(() => {
     if (!usuario) {
       setFormData({ documento: "", clave: "" });
@@ -170,21 +170,20 @@ const pagosMorosos = React.useMemo(() => {
       setMostrarRestablecerPin(false);
       setArchivoHabitantes(null);
       setMostrarGenerarCuotas(false);
+      setHabitantes([]);
       borrarToken();
     }
   }, [usuario]);
 
-    useEffect(() => {
-       // Solo el administrador necesita la lista completa. Los demás roles usan los datos de su ingreso.
+  useEffect(() => {
+    // Solo el administrador necesita la lista completa. Los demás roles usan los datos de su ingreso.
     if (!usuario || usuario.rolActivo !== "Administrador") return;
     fetch(`${API_BASE}/api/habitantes`, { cache: "no-store" })
       .then((r) => r.json())
       .then((data) => {
         if (Array.isArray(data.habitantes)) setHabitantes(data.habitantes);
       })
-      .catch((err) => console.error("No se pudieron cargar los habitantes:", err)); 
-            setMostrarGenerarCuotas(false);
-      setHabitantes([]);
+      .catch((err) => console.error("No se pudieron cargar los habitantes:", err));
   }, [usuario]);
       
   // Valida el ingreso contra Habitantes.csv (backend /api/auth/ingresar).
