@@ -38,7 +38,6 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
-app.options("*", cors(corsOptions)); // Responde a las peticiones preflight del navegador
 
 /* =========================
    Middlewares base
