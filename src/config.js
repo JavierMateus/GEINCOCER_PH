@@ -1,6 +1,8 @@
-// src/config.js
-const API_BASE = window.location.hostname === "localhost" 
-  ? "http://localhost:4000" 
-  : ""; 
+import axios from 'axios';
 
-export { API_BASE };
+// Configuración global para que Axios siempre envíe credenciales y cookies
+axios.defaults.withCredentials = true;
+
+export const API_BASE = process.env.NODE_ENV === 'production' 
+  ? 'https://geincocer-app.onrender.com' 
+  : 'http://localhost:4000';
