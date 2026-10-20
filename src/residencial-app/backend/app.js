@@ -34,11 +34,13 @@ const app = express();
    1. Configuración Global de CORS
 ========================= */
 const corsOptions = {
-  origin: true, // <-- Cambiar "*" por "true" permite reflejar cualquier origen de forma segura con credenciales
+  origin: ["https://geincocer-app.onrender.com", "http://localhost:3000", "http://localhost:4000"],
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
   credentials: true
 };
+
+app.use(cors(corsOptions));
 
 app.use(cors(corsOptions));
 
