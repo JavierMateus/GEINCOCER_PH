@@ -37,7 +37,15 @@ window.fetch = async (entrada, opciones = {}) => {
     if (!headers.has("Authorization")) headers.set("Authorization", `Bearer ${token}`);
     opciones = { ...opciones, headers };
   }
-  const resp = await fetchOriginal(entrada, opciones);
+
+  // Asegura que la ruta use API_BASE si empieza por /api
+   let urlFinal = entrada;
+   if (typeof entrada === "string" && entrada.startsWith("/api")) {
+     urlFinal = `${API_BASE}${entrada}`;
+   }
+
+   const resp = await fetchOriginal(urlFinal, opciones);
+  
   if (llevaSesion && resp.status === 401) {
     // Un 401 por un PIN equivocado no trae este código, así que no cierra la sesión.
     resp.clone().json().then((d) => { if (d && d.codigo === "SESION_INVALIDA") sesionExpirada(numeroAlSalir); }).catch(() => {});
