@@ -30,8 +30,11 @@ const app = express();
 /* =========================
    1. Configuración Global de CORS (DEBE IR PRIMERO)
 ========================= */
+/* =========================
+   1. Configuración Global de CORS
+========================= */
 const corsOptions = {
-  origin: "*",
+  origin: true, // <-- Cambiar "*" por "true" permite reflejar cualquier origen de forma segura con credenciales
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
   credentials: true
