@@ -28,6 +28,25 @@ const mantenimientoRoutes = require("./routes/mantenimientoRoutes");
 const app = express();
 
 /* =========================
+   1. Configuración Global de CORS (DEBE IR PRIMERO)
+========================= */
+const corsOptions = {
+  origin: "*",
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+};
+
+app.use(cors(corsOptions));
+app.options("*", cors(corsOptions)); // Responde a las peticiones preflight del navegador
+
+/* =========================
+   Middlewares base
+========================= */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* =========================
    Rutas oficiales BaseResidencial
 ========================= */
 const baseResidencialDir = process.env.NODE_ENV === 'production' 
@@ -88,12 +107,8 @@ if (!fs.existsSync(archivoNotificacionesCSV)) {
 }
 
 /* =========================
-   Middlewares
+   Archivos Estáticos y Logs
 ========================= */
-app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-app.use("/api", requiereSesion);
 app.use(express.static(publicDir));
 app.use('/Notificaciones', express.static(notificacionesDir));
 const uploadsDir = path.join(baseResidencialDir, "Notificaciones");
@@ -128,22 +143,17 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-app.use(cors({
-  origin: "*", // O pon "https://geincocer-app.onrender.com"
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"],
-  credentials: true
-}));
-
 /* =========================
-   Rutas generales
+   Rutas generales de la API
 ========================= */
 app.use('/api/obligaciones', obligacionesRoutes);
 app.use("/api/habitantes", habitantesRoutes(baseResidencialDir));
 app.use("/api/liquidacion-intereses", liquidacionInteresesRoutes(baseResidencialDir));
+
 const rutasAuth = authRoutes(baseResidencialDir);
 app.use("/api/pagos-recibidos", pagosRecibidosRoutes(baseResidencialDir, rutasAuth.verificarAdmin));
-app.use("/api/auth", rutasAuth);
+app.use("/api/auth", rutasAuth); // <--- Autenticación pública para el login
+
 app.use("/api/inventario", inventarioRoutes(baseResidencialDir, rutasAuth.verificarAdmin));
 app.use("/api/bitacora", bitacoraRoutes(baseResidencialDir, rutasAuth.verificarAdmin));
 app.use("/api/cuotas", cuotasRoutes(baseResidencialDir));
@@ -319,10 +329,11 @@ app.delete('/api/notificaciones/:id', (req, res) => {
   }
 });
 
-// 1. Indicarle a Express que sirva todos los archivos de la carpeta 'public'
+/* =========================
+   Frontend SPA Fallback (React)
+========================= */
 app.use(express.static(path.join(__dirname, 'public')));
 
-// 2. Capturar cualquier ruta y devolver el index.html de React
 app.get(/^(?!\/api).*/, (req, res) => {
     res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -330,7 +341,7 @@ app.get(/^(?!\/api).*/, (req, res) => {
 /* =========================
    Arrancar servidor
 ========================= */
-const PORT = 4000;
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
   console.log(`Backend corriendo en el puerto ${PORT}`);
   console.log(`BaseResidencial: ${baseResidencialDir}`);
