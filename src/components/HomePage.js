@@ -207,10 +207,10 @@ const pagosMorosos = React.useMemo(() => {
     setIngresando(true);
     try {
       const resp = await fetch(`${API_BASE}/api/auth/ingresar`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ documento, clave, rol: rolBuscado }),
-      });
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ documento, clave, rol: rolBuscado }),
+});
       const data = await resp.json().catch(() => ({}));
 
       if (!resp.ok) {
