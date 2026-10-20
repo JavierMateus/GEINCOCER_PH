@@ -1,6 +1,7 @@
 // backend/app.js
 const express = require('express');
 const cors = require('cors');
+const cors = require("cors");
 const fs = require('fs');
 const path = require('path');
 const multer = require('multer');
@@ -127,6 +128,13 @@ const storage = multer.diskStorage({
 });
 
 const upload = multer({ storage });
+
+app.use(cors({
+  origin: "*", // O pon "https://geincocer-app.onrender.com"
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true
+}));
 
 /* =========================
    Rutas generales
