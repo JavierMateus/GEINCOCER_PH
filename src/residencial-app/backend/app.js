@@ -54,8 +54,9 @@ app.use(express.urlencoded({ extended: true }));
    Rutas oficiales BaseResidencial
 ========================= */
 const baseResidencialDir = process.env.NODE_ENV === 'production' 
-  ? path.join(__dirname, '..', 'BaseResidencial') 
+  ? path.join(__dirname, 'public', 'BaseResidencial') 
   : 'C:\\Users\\Javier Mateus\\Desktop\\Geincocer\\BaseResidencial';
+  
 const obligacionesController =
   crearObligacionesController(baseResidencialDir);
 const obligacionesRoutes =
