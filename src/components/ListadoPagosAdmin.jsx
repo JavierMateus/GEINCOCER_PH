@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { descargarComprobante } from "./comprobantePago";
+import { API_BASE } from "../config"; // Ajusta la ruta relativa hacia tu config.js si es necesario
 
 const limpiarTexto = (valor) => String(valor ?? "").trim();
 
@@ -92,7 +93,7 @@ function ListadoPagosAdmin({ onBack, setVistaActiva, volverA }) {
     try {
       setCargando(true);
       setError("");
-      const resp = await fetch("/api/pagos", { cache: "no-store" });
+      const resp = await fetch(`${API_BASE}/api/pagos`, { cache: "no-store" });
       if (!resp.ok) throw new Error(`No se pudieron cargar pagos. Error ${resp.status}`);
       const data = await resp.json();
       setPagos(Array.isArray(data?.pagos) ? data.pagos : []);
@@ -114,8 +115,8 @@ function ListadoPagosAdmin({ onBack, setVistaActiva, volverA }) {
     if (enviandoAnular) return;
     try {
       setEnviandoAnular(true);
-      const resp = await fetch("/api/pagos-recibidos/anular", {
-        method: "POST",
+      const resp = await fetch(`${API_BASE}/api/pagos-recibidos/anular`, {
+       method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           idPago: anulando.idPago,
