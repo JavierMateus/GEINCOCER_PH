@@ -149,6 +149,7 @@ function AdminDashboard({
           // ===== Incidentes reales: bitácora de seguridad + incidentes reportados por residentes (PQRS) =====
   const [bitacora, setBitacora] = useState([]);
   const [pqrsIncidentes, setPqrsIncidentes] = useState([]);
+  const [pqrsTodas, setPqrsTodas] = useState([]);
 
   useEffect(() => {
     let vigente = true;
@@ -160,6 +161,7 @@ function AdminDashboard({
         ]);
         if (!vigente) return;
         setBitacora(Array.isArray(datosBitacora.novedades) ? datosBitacora.novedades : []);
+        setPqrsTodas(Array.isArray(datosPqrs) ? datosPqrs : []);
         setPqrsIncidentes(
           Array.isArray(datosPqrs) ? datosPqrs.filter((p) => String(p.Tipo || "").trim() === "Incidente") : []
         );
@@ -183,6 +185,10 @@ function AdminDashboard({
     ["radicada", "en proceso"].includes(String(p.Estado || "").trim().toLowerCase())
   ).length;
   const incidentesAbiertos = abiertasBitacora + abiertasPqrs;
+    // PQRS por responder: las radicadas (nuevas) y las que siguen en proceso.
+  const pqrsPorResponder = pqrsTodas.filter((p) =>
+    ["radicada", "en proceso"].includes(String(p.Estado || "").trim().toLowerCase())
+  ).length;
   const totalIncidentes = novedadesDelMes + pqrsIncidentesDelMes + incidentes.length;
 
   // Abre la bitácora de seguridad (el administrador puede atender las novedades ahí).
@@ -312,7 +318,7 @@ function AdminDashboard({
         <DashboardCard
   icon="🔔"
   valor={mostrarPQRS ? "Abierto" : "Ver"}
-  titulo="PQRS"
+  titulo={pqrsPorResponder > 0 ? `PQRS (${pqrsPorResponder} por responder)` : "PQRS"}
   onClick={() => setMostrarPQRS((prev) => !prev)}
   clickable
   resaltado={mostrarPQRS}

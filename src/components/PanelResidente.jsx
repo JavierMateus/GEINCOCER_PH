@@ -1114,7 +1114,7 @@ return (
       ) : (
         <tr>
           <td
-            colSpan="8"
+            colSpan="9"
             style={{ padding: "14px", color: "#64748b", textAlign: "center" }}
           >
             No hay movimientos registrados para este residente.
@@ -2246,6 +2246,7 @@ return (
   <th style={{ padding: "10px" }}>Fecha reserva</th>
   <th style={{ padding: "10px" }}>Hora</th>
   <th style={{ padding: "10px" }}>Estado</th>
+  <th style={{ padding: "10px" }}>Mi adjunto</th>
   <th style={{ padding: "10px" }}>Respuesta</th>
   <th style={{ padding: "10px" }}>Fecha respuesta</th>
   <th style={{ padding: "10px" }}>Acciones</th>
@@ -2282,6 +2283,21 @@ return (
 </td>
 <td style={{ padding: "10px", fontWeight: "bold" }}>
   {item.Estado || "-"}
+</td>
+
+<td style={{ padding: "10px" }}>
+  {item.URL_Adjunto && item.URL_Adjunto !== "-" ? (
+    <a
+      href={`${API_BASE}${item.URL_Adjunto}`}
+      target="_blank"
+      rel="noopener noreferrer"
+      style={{ color: "#0d6efd", textDecoration: "underline" }}
+    >
+      Ver adjunto
+    </a>
+  ) : (
+    <span style={{ color: "#94a3b8" }}>Sin adjunto</span>
+  )}
 </td>
           <td style={{ padding: "10px" }}>
   {item.URL_RespuestaAdmin && item.URL_RespuestaAdmin !== "-" ? (
