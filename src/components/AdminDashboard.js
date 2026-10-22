@@ -5,6 +5,7 @@ import NotificacionesInforme from "./NotificacionesInforme";
 import BotonImportacion from "./BotonImportacion";
 import PQRSAdmin from "./PQRSAdmin";
 import { API_BASE } from "../config";
+import ReporteMascotasAdmin from './ReporteMascotasAdmin';
 
 // Componente para las tarjetas del dashboard
 function DashboardCard({ icon, valor, titulo, onClick, clickable, resaltado, ancho }) {
@@ -39,7 +40,7 @@ function DashboardCard({ icon, valor, titulo, onClick, clickable, resaltado, anc
       </div>
       <div
         style={{
-                    fontSize: String(valor).length > 12 ? "1.6em" : "2.0em",
+          fontSize: String(valor).length > 12 ? "1.6em" : "2.0em",
           whiteSpace: "nowrap",
           fontWeight: "bold",
           color: resaltado ? "#ea580c" : "#111827",
@@ -48,15 +49,15 @@ function DashboardCard({ icon, valor, titulo, onClick, clickable, resaltado, anc
         {valor}
       </div>
       <div
-  style={{
-    fontSize: "0.98em",
-    color: resaltado ? "#9a3412" : "#334155",
-    fontWeight: resaltado ? "700" : "700",
-    letterSpacing: "0.4px",
-  }}
->
-  {titulo}
-</div>
+        style={{
+          fontSize: "0.98em",
+          color: resaltado ? "#9a3412" : "#334155",
+          fontWeight: resaltado ? "700" : "700",
+          letterSpacing: "0.4px",
+        }}
+      >
+        {titulo}
+      </div>
     </div>
   );
 }
@@ -84,12 +85,15 @@ function AdminDashboard({
   const [nuevasNotificaciones, setNuevasNotificaciones] = useState(0);
   const [totalNotificaciones, setTotalNotificaciones] = useState(0);
   const [mostrarPQRS, setMostrarPQRS] = useState(false);
+  
+  // 🐾 Estado para controlar la vista del Censo / Reporte de Mascotas
+  const [vistaActiva, setVistaActiva] = useState('menuPrincipal');
 
   // ===== useEffect 1: total notificaciones (backend) =====
   useEffect(() => {
     const fetchConteoNotificaciones = async () => {
       try {
-        const resp = await fetch("${API_BASE}/api/notificaciones");
+        const resp = await fetch(`${API_BASE}/api/notificaciones`);
         const data = await resp.json();
         setTotalNotificaciones(Array.isArray(data) ? data.length : 0);
       } catch (err) {
@@ -136,17 +140,17 @@ function AdminDashboard({
 
   // ===== funciones =====
   const abrirNotificaciones = () => {
-  const clave = "ultimaVisitaNotificaciones";
+    const clave = "ultimaVisitaNotificaciones";
 
-  if (!modalNotif) {
-    localStorage.setItem(clave, Date.now().toString());
-    setNuevasNotificaciones(0);
-  }
+    if (!modalNotif) {
+      localStorage.setItem(clave, Date.now().toString());
+      setNuevasNotificaciones(0);
+    }
 
-  setModalNotif((prev) => !prev);
-};
+    setModalNotif((prev) => !prev);
+  };
 
-          // ===== Incidentes reales: bitácora de seguridad + incidentes reportados por residentes (PQRS) =====
+  // ===== Incidentes reales: bitácora de seguridad + incidentes reportados por residentes (PQRS) =====
   const [bitacora, setBitacora] = useState([]);
   const [pqrsIncidentes, setPqrsIncidentes] = useState([]);
   const [pqrsTodas, setPqrsTodas] = useState([]);
@@ -174,8 +178,6 @@ function AdminDashboard({
     return () => { vigente = false; clearInterval(timer); };
   }, []);
 
-  // La tarjeta suma tres fuentes: todas las novedades de la bitácora, los incidentes que
-  // reportan los residentes en Solicitudes/PQRS y los incidentes importados (como antes).
   const mesActual = new Date().toLocaleDateString("en-CA", { timeZone: "America/Bogota" }).slice(0, 7);
   const enElMes = (fecha) => String(fecha || "").startsWith(mesActual);
   const novedadesDelMes = bitacora.filter((n) => enElMes(n.Fecha)).length;
@@ -185,16 +187,14 @@ function AdminDashboard({
     ["radicada", "en proceso"].includes(String(p.Estado || "").trim().toLowerCase())
   ).length;
   const incidentesAbiertos = abiertasBitacora + abiertasPqrs;
-    // PQRS por responder: las radicadas (nuevas) y las que siguen en proceso.
   const pqrsPorResponder = pqrsTodas.filter((p) =>
     ["radicada", "en proceso"].includes(String(p.Estado || "").trim().toLowerCase())
   ).length;
   const totalIncidentes = novedadesDelMes + pqrsIncidentesDelMes + incidentes.length;
 
-  // Abre la bitácora de seguridad (el administrador puede atender las novedades ahí).
   const abrirBitacora = () => setUsuario({ ...usuario, rolActivo: "Seguridad", vistaInicial: "bitacora" });
 
-    // ===== Vehículos y parqueaderos guardados en el servidor =====
+  // ===== Vehículos y parqueaderos guardados en el servidor =====
   const [resumenInv, setResumenInv] = useState({ vehiculos: 0, parqueaderos: 0, manejaParqueaderos: false });
 
   useEffect(() => {
@@ -218,7 +218,7 @@ function AdminDashboard({
     };
   }, []);
 
-    // ===== Morosidad real, calculada desde la cartera =====
+  // ===== Morosidad real =====
   const [moraResumen, setMoraResumen] = useState(null);
   useEffect(() => {
     let vigente = true;
@@ -241,10 +241,6 @@ function AdminDashboard({
     };
   }, []);
 
-     // ===== Habitantes e inmuebles, contados con el mismo criterio de la generación de cuotas =====
-  // Habitantes = residentes activos. El administrador, el personal de seguridad y el de mantenimiento
-  // no viven en un inmueble y no cuentan; tampoco quienes ya salieron del conjunto.
-  // Inmuebles = ubicaciones (torre y apartamento) distintas donde vive algún residente activo.
   const claveFechaHab = (valor) => {
     const t = String(valor || "").trim();
     let m = t.match(/^(\d{4})[-/](\d{1,2})[-/](\d{1,2})/);
@@ -270,7 +266,7 @@ function AdminDashboard({
     listaResidentes.filter((h) => h.TorreManzana && h.AptoCasa).map((h) => claveUbicacion(h.TorreManzana, h.AptoCasa))
   ).size;
 
-    // ===== Mantenimiento real: tareas abiertas y urgentes =====
+  // ===== Mantenimiento real =====
   const [mantResumen, setMantResumen] = useState(null);
   useEffect(() => {
     let vigente = true;
@@ -288,6 +284,11 @@ function AdminDashboard({
     return () => { vigente = false; clearInterval(timer); };
   }, []);
 
+  // 🐾 Condición para mostrar el reporte de mascotas cuando el admin hace clic en la tarjeta
+  if (vistaActiva === 'reporteMascotas') {
+    return <ReporteMascotasAdmin onBack={() => setVistaActiva('menuPrincipal')} />;
+  }
+
   // ===== return ÚNICO DEL COMPONENTE =====
   return (
     <div style={{ position: "relative", width: "100%" }}>
@@ -302,28 +303,29 @@ function AdminDashboard({
           flexWrap: "wrap",
         }}
       >
-       <DashboardCard
-  icon="📢"
-  valor={modalNotif ? "Abierto" : "Ver"}
-  titulo={
-    nuevasNotificaciones > 0
-      ? `NOTIFICACIONES (${nuevasNotificaciones} nuevas)`
-      : `NOTIFICACIONES (${totalNotificaciones})`
-  }
-  onClick={abrirNotificaciones}
-  clickable
-  resaltado={modalNotif}
-/>
+        <DashboardCard
+          icon="📢"
+          valor={modalNotif ? "Abierto" : "Ver"}
+          titulo={
+            nuevasNotificaciones > 0
+              ? `NOTIFICACIONES (${nuevasNotificaciones} nuevas)`
+              : `NOTIFICACIONES (${totalNotificaciones})`
+          }
+          onClick={abrirNotificaciones}
+          clickable
+          resaltado={modalNotif}
+        />
 
         <DashboardCard
-  icon="🔔"
-  valor={mostrarPQRS ? "Abierto" : "Ver"}
-  titulo={pqrsPorResponder > 0 ? `PQRS (${pqrsPorResponder} por responder)` : "PQRS"}
-  onClick={() => setMostrarPQRS((prev) => !prev)}
-  clickable
-  resaltado={mostrarPQRS}
-/>
-        <DashboardCard
+          icon="🔔"
+          valor={mostrarPQRS ? "Abierto" : "Ver"}
+          titulo={pqrsPorResponder > 0 ? `PQRS (${pqrsPorResponder} por responder)` : "PQRS"}
+          onClick={() => setMostrarPQRS((prev) => !prev)}
+          clickable
+          resaltado={mostrarPQRS}
+        />
+        
+          <DashboardCard
           icon="👥"
           valor={residentesActivos}
           titulo="HABITANTES"
@@ -335,13 +337,13 @@ function AdminDashboard({
           titulo="INMUEBLES"
         />
 
-                <DashboardCard icon="🚗" valor={resumenInv.vehiculos} titulo="VEHÍCULOS" />
+        <DashboardCard icon="🚗" valor={resumenInv.vehiculos} titulo="VEHÍCULOS" />
 
-                {resumenInv.manejaParqueaderos && (
+        {resumenInv.manejaParqueaderos && (
           <DashboardCard icon="🅿️" valor={resumenInv.parqueaderos} titulo="PARQUEADEROS" />
         )}
 
-                <DashboardCard
+        <DashboardCard
           icon="📊"
           ancho="240px"
           valor={moraResumen ? `$${Number(moraResumen.totalMora || 0).toLocaleString("es-CO")}` : "..."}
@@ -352,7 +354,7 @@ function AdminDashboard({
           }
         />
         
-          <DashboardCard
+        <DashboardCard
           icon="🛠️"
           valor={mantResumen ? mantResumen.abiertas : "..."}
           titulo={mantResumen && mantResumen.urgentes > 0 ? `MANTENIMIENTO (${mantResumen.urgentes} urgentes)` : "MANTENIMIENTO"}
@@ -363,14 +365,23 @@ function AdminDashboard({
 
         <DashboardCard
           icon="⚠️"
-                    valor={totalIncidentes}
+          valor={totalIncidentes}
           titulo={incidentesAbiertos > 0 ? `INCIDENTES DEL MES (${incidentesAbiertos} abiertos)` : "INCIDENTES DEL MES"}
           onClick={abrirBitacora}
           clickable
         />
+
+        {/* 🐾 Botón de acceso rápido al Censo / Reporte de Mascotas en forma de tarjeta */}
+        <DashboardCard
+          icon="🐾"
+          valor="Ver"
+          titulo="CENSO MASCOTAS"
+          onClick={() => setVistaActiva('reporteMascotas')}
+          clickable
+        />
       </div>
 
-      {/* Tablas importadas (habitantes, inmuebles, pagos, etc.) */}
+      {/* Tablas importadas */}
       <div style={{ marginBottom: "24px" }}>
         {moduloActivo && (
           <TablaImportada
@@ -422,90 +433,90 @@ function AdminDashboard({
         </div>
       </div>
 
-      {/* Panel de notificaciones con la tabla COMPLETA (nuevo informe) */}
+      {/* Panel de notificaciones */}
       {modalNotif && (
-  <div
-    style={{
-      background: "#ffffff",
-      borderRadius: "20px",
-      boxShadow: "0 8px 24px rgba(30, 41, 59, 0.08)",
-      padding: "1.2em",
-      marginTop: "12px",
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "10px",
-        marginBottom: "12px",
-      }}
-    >
-      
-      <button
-        onClick={() => setModalNotif(false)}
-        style={{
-          padding: "0.65em 1.2em",
-          background: "#e2e8f0",
-          color: "#0f172a",
-          border: "none",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
-      >
-        Ocultar
-      </button>
-    </div>
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "20px",
+            boxShadow: "0 8px 24px rgba(30, 41, 59, 0.08)",
+            padding: "1.2em",
+            marginTop: "12px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px",
+              marginBottom: "12px",
+            }}
+          >
+            <button
+              onClick={() => setModalNotif(false)}
+              style={{
+                padding: "0.65em 1.2em",
+                background: "#e2e8f0",
+                color: "#0f172a",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              Ocultar
+            </button>
+          </div>
 
-    <NotificacionesInforme
-      usuario={usuario}
-      onClose={() => setModalNotif(false)}
-    />
-  </div>
-)}
-     {mostrarPQRS && (
-  <div
-    style={{
-      background: "#ffffff",
-      borderRadius: "20px",
-      boxShadow: "0 8px 24px rgba(30, 41, 59, 0.08)",
-      padding: "1.2em",
-      marginTop: "12px",
-    }}
-  >
-    <div
-      style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        flexWrap: "wrap",
-        gap: "10px",
-        marginBottom: "12px",
-      }}
-    >
-      
-      <button
-        onClick={() => setMostrarPQRS(false)}
-        style={{
-          padding: "0.65em 1.2em",
-          background: "#e2e8f0",
-          color: "#0f172a",
-          border: "none",
-          borderRadius: "10px",
-          cursor: "pointer",
-          fontWeight: "bold",
-        }}
-      >
-        Ocultar
-      </button>
-    </div>
+          <NotificacionesInforme
+            usuario={usuario}
+            onClose={() => setModalNotif(false)}
+          />
+        </div>
+      )}
 
-    <PQRSAdmin />
-  </div>
-)}
+      {/* Panel de PQRS */}
+      {mostrarPQRS && (
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "20px",
+            boxShadow: "0 8px 24px rgba(30, 41, 59, 0.08)",
+            padding: "1.2em",
+            marginTop: "12px",
+          }}
+        >
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              flexWrap: "wrap",
+              gap: "10px",
+              marginBottom: "12px",
+            }}
+          >
+            <button
+              onClick={() => setMostrarPQRS(false)}
+              style={{
+                padding: "0.65em 1.2em",
+                background: "#e2e8f0",
+                color: "#0f172a",
+                border: "none",
+                borderRadius: "10px",
+                cursor: "pointer",
+                fontWeight: "bold",
+              }}
+            >
+              Ocultar
+            </button>
+          </div>
+
+          <PQRSAdmin />
+        </div>
+      )}
     </div>
   );
 }

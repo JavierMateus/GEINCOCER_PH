@@ -87,9 +87,17 @@ const aptoCasa =
   }
 };
 
+const documentoResidenteActual = String(
+  usuario?.documento ||
+  usuario?.Documento ||
+  usuario?.DocumentoResidente ||
+  ""
+).trim();
+
+// ⬇️ CORREGIDO: Usamos la variable correcta 'documentoResidenteActual'
 useEffect(() => {
   cargarPqrs();
-}, [vistaActiva, documentoUsuario]);
+}, [vistaActiva, documentoResidenteActual]);
 
 const [pagosBackend, setPagosBackend] = useState([]);
 
@@ -100,13 +108,6 @@ const pagosFallback = Array.isArray(pagos)
   : Array.isArray(pagos?.pagos)
   ? pagos.pagos
   : [];
-
-const documentoResidenteActual = String(
-  usuario?.documento ||
-  usuario?.Documento ||
-  usuario?.DocumentoResidente ||
-  ""
-).trim();
 
 const aNumero = (valor) =>
   Number(String(valor ?? 0).replace(/[^\d.-]/g, "")) || 0;
@@ -164,6 +165,150 @@ const reservasDelResidente = reservasArray.filter((r) => {
 
   return documentoReserva === documentoResidenteActual;
 });
+
+// ==========================================
+  // ESTADOS Y FUNCIONES PARA MÚLTIPLES MASCOTAS
+  // ==========================================
+  // ==========================================
+  // ESTADOS Y FUNCIONES PARA MÚLTIPLES MASCOTAS
+  // ==========================================
+  const [mostrarModalMascotas, setMostrarModalMascotas] = useState(false);
+  const [tieneMascotas, setTieneMascotas] = useState('No');
+  const [listaMascotasTemp, setListaMascotasTemp] = useState([]);
+  const [enviandoMascota, setEnviandoMascota] = useState(false);
+
+  const [tempPet, setTempPet] = useState({
+    tipo: 'Perro',
+    nombre: '',
+    raza: '',
+    vacunasAlDia: 'Sí'
+  });
+
+  // Ejecutamos SIEMPRE al cargar el componente
+  useEffect(() => {
+    verificarRegistroMascota();
+  }, [usuario, torreManzana, aptoCasa]);
+
+  async function verificarRegistroMascota() {
+    try {
+      // Obtener Torre y Apto buscando en todas las propiedades posibles
+      const tUser = String(
+        torreManzana ||
+        usuario?.TorreManzana ||
+        usuario?.['Torre/Manzana'] ||
+        usuario?.torreManzana ||
+        usuario?.torre ||
+        ''
+      ).trim();
+
+      const aUser = String(
+        aptoCasa ||
+        usuario?.AptoCasa ||
+        usuario?.['Apto/Casa'] ||
+        usuario?.aptoCasa ||
+        usuario?.apto ||
+        ''
+      ).trim();
+
+      // Si aún no se han cargado los datos del usuario, no evaluamos todavía
+      if (!tUser && !aUser) return;
+
+      const resp = await fetch(`${API_BASE}/api/mascotas`);
+      const data = await resp.json();
+      const lista = Array.isArray(data.mascotas) ? data.mascotas : [];
+
+      // Verificar si existe registro previo para ESTE inmueble
+      const registrado = lista.some(
+        m => String(m.torre).trim().toLowerCase() === tUser.toLowerCase() &&
+             String(m.apto).trim().toLowerCase() === aUser.toLowerCase()
+      );
+
+      if (!registrado) {
+        setMostrarModalMascotas(true);
+      }
+    } catch (err) {
+      console.error("Error verificando mascotas:", err);
+    }
+  }
+
+  function agregarMascotaALista(e) {
+    e.preventDefault();
+    if (!tempPet.nombre || !tempPet.raza) {
+      alert("Por favor completa el nombre y la raza de la mascota.");
+      return;
+    }
+    setListaMascotasTemp([...listaMascotasTemp, tempPet]);
+    setTempPet({ tipo: 'Perro', nombre: '', raza: '', vacunasAlDia: 'Sí' });
+  }
+
+  function quitarMascotaTemp(index) {
+    const nuevaLista = listaMascotasTemp.filter((_, i) => i !== index);
+    setListaMascotasTemp(nuevaLista);
+  }
+
+  async function guardarTodasLasMascotas(e) {
+    e.preventDefault();
+    try {
+      setEnviandoMascota(true);
+
+      const tUser = String(
+        torreManzana ||
+        usuario?.TorreManzana ||
+        usuario?.['Torre/Manzana'] ||
+        usuario?.torreManzana ||
+        usuario?.torre ||
+        ''
+      ).trim();
+
+      const aUser = String(
+        aptoCasa ||
+        usuario?.AptoCasa ||
+        usuario?.['Apto/Casa'] ||
+        usuario?.aptoCasa ||
+        usuario?.apto ||
+        ''
+      ).trim();
+
+      const bodyData = {
+        torre: tUser,
+        apto: aUser,
+        tieneMascota: tieneMascotas,
+        mascotas: tieneMascotas === 'Sí' ? listaMascotasTemp : []
+      };
+
+      const resp = await fetch(`${API_BASE}/api/mascotas`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(bodyData)
+      });
+
+      if (!resp.ok) throw new Error("Error al guardar la información");
+
+      alert("Registro de mascotas guardado correctamente.");
+      setMostrarModalMascotas(false);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setEnviandoMascota(false);
+    }
+  }
+
+// Función para agregar una mascota a la lista temporal antes de guardar
+function agregarMascotaALista(e) {
+  e.preventDefault();
+  if (!tempPet.nombre || !tempPet.raza) {
+    alert("Por favor completa el nombre y la raza de la mascota.");
+    return;
+  }
+  setListaMascotasTemp([...listaMascotasTemp, tempPet]);
+  setTempPet({ tipo: 'Perro', nombre: '', raza: '', vacunasAlDia: 'Sí' });
+}
+
+// Función para eliminar de la lista temporal si se equivocaron
+function quitarMascotaTemp(index) {
+  const nuevaLista = listaMascotasTemp.filter((_, i) => i !== index);
+  setListaMascotasTemp(nuevaLista);
+}
 
 const parseFechaCSV = (valor) => {
   if (!valor || String(valor).trim() === "") return null;
@@ -2376,9 +2521,125 @@ return (
             </p>
           )}
         </div>
-      </div>
-      );
-};
+        
+      {/* ================= MODAL OBLIGATORIO DE MASCOTAS ================= */}
+      {mostrarModalMascotas && (
+        <div style={{
+          position: 'fixed', top: 0, left: 0, right: 0, bottom: 0,
+          backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex',
+          justifyContent: 'center', alignItems: 'center', zIndex: 9999
+        }}>
+          <div style={{ background: '#fff', padding: '25px', borderRadius: '12px', maxWidth: '500px', width: '90%', maxHeight: '90vh', overflowY: 'auto' }}>
+            <h3 style={{ marginTop: 0, color: '#1a237e' }}>🐾 Declaración Obligatoria de Mascotas</h3>
+            <p style={{ fontSize: '13px', color: '#555' }}>
+              Por disposición de la administración, registra todas las mascotas que posees en tu inmueble.
+            </p>
 
+            <div style={{ marginBottom: '15px' }}>
+              <label style={{ fontWeight: 'bold', display: 'block', marginBottom: '5px' }}>
+                ¿Tiene mascotas en el inmueble?
+              </label>
+              <select
+                value={tieneMascotas}
+                onChange={(e) => setTieneMascotas(e.target.value)}
+                style={{ width: '100%', padding: '8px', borderRadius: '6px' }}
+              >
+                <option value="No">No</option>
+                <option value="Sí">Sí</option>
+              </select>
+            </div>
+
+            {tieneMascotas === 'Sí' && (
+              <div style={{ background: '#f8f9fa', padding: '12px', borderRadius: '8px', marginBottom: '15px', border: '1px solid #ddd' }}>
+                <h4 style={{ margin: '0 0 10px 0', fontSize: '14px', color: '#333' }}>Agregar Mascota:</h4>
+                
+                <div style={{ marginBottom: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '12px' }}>Tipo:</label>
+                  <select
+                    value={tempPet.tipo}
+                    onChange={(e) => setTempPet({ ...tempPet, tipo: e.target.value })}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px' }}
+                  >
+                    <option value="Perro">Perro</option>
+                    <option value="Gato">Gato</option>
+                    <option value="Ave">Ave</option>
+                    <option value="Otro">Otro</option>
+                  </select>
+                </div>
+
+                <div style={{ marginBottom: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '12px' }}>Nombre:</label>
+                  <input
+                    type="text"
+                    value={tempPet.nombre}
+                    onChange={(e) => setTempPet({ ...tempPet, nombre: e.target.value })}
+                    placeholder="Ej. Firulais"
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '8px' }}>
+                  <label style={{ display: 'block', fontSize: '12px' }}>Raza:</label>
+                  <input
+                    type="text"
+                    value={tempPet.raza}
+                    onChange={(e) => setTempPet({ ...tempPet, raza: e.target.value })}
+                    placeholder="Ej. Criollo"
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px', boxSizing: 'border-box' }}
+                  />
+                </div>
+
+                <div style={{ marginBottom: '10px' }}>
+                  <label style={{ display: 'block', fontSize: '12px' }}>¿Vacunas al día?</label>
+                  <select
+                    value={tempPet.vacunasAlDia}
+                    onChange={(e) => setTempPet({ ...tempPet, vacunasAlDia: e.target.value })}
+                    style={{ width: '100%', padding: '6px', borderRadius: '6px' }}
+                  >
+                    <option value="Sí">Sí</option>
+                    <option value="No">No</option>
+                  </select>
+                </div>
+
+                <button
+                  type="button"
+                  onClick={agregarMascotaALista}
+                  style={{ width: '100%', padding: '8px', background: '#1976d2', color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold' }}
+                >
+                  + Añadir esta mascota a la lista
+                </button>
+
+                {listaMascotasTemp.length > 0 && (
+                  <div style={{ marginTop: '12px' }}>
+                    <p style={{ fontSize: '12px', fontWeight: 'bold', margin: '0 0 5px 0' }}>Mascotas agregadas ({listaMascotasTemp.length}):</p>
+                    {listaMascotasTemp.map((m, idx) => (
+                      <div key={idx} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', background: '#fff', padding: '6px 10px', marginBottom: '4px', borderRadius: '4px', border: '1px solid #ccc', fontSize: '12px' }}>
+                        <span><strong>{m.tipo}:</strong> {m.nombre} ({m.raza})</span>
+                        <button type="button" onClick={() => quitarMascotaTemp(idx)} style={{ background: '#d32f2f', color: '#fff', border: 'none', borderRadius: '4px', cursor: 'pointer', padding: '2px 6px' }}>X</button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <button
+              type="button"
+              disabled={enviandoMascota || (tieneMascotas === 'Sí' && listaMascotasTemp.length === 0)}
+              onClick={guardarTodasLasMascotas}
+              style={{
+                width: '100%', padding: '10px', backgroundColor: (tieneMascotas === 'Sí' && listaMascotasTemp.length === 0) ? '#ccc' : '#2e7d32',
+                color: '#fff', border: 'none', borderRadius: '6px', cursor: 'pointer', fontWeight: 'bold'
+              }}
+            >
+              {enviandoMascota ? "Guardando..." : "Guardar y Continuar"}
+            </button>
+          </div>
+        </div>
+      )}
+    </div> // <-- Este es el </div> final que cierra el componente PanelResidente
+  );
+}
+ 
     
 export default PanelResidente;

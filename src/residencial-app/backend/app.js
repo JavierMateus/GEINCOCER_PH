@@ -56,6 +56,8 @@ app.use(express.urlencoded({ extended: true }));
 const baseResidencialDir = process.env.NODE_ENV === 'production' 
   ? path.join(__dirname, 'public', 'BaseResidencial') 
   : 'C:\\Users\\Javier Mateus\\Desktop\\Geincocer\\BaseResidencial';
+
+  const mascotasPath = path.join(baseResidencialDir, 'Mascotas.csv');
   
 const obligacionesController =
   crearObligacionesController(baseResidencialDir);
@@ -168,6 +170,84 @@ app.use("/api/mantenimiento", mantenimientoRoutes(baseResidencialDir, rutasAuth.
 app.use('/api/pagos', pagosRoutes);
 app.use('/api/mercadopago', mercadopagoRoutes);
 app.use('/api/import-export', importExportRoutes);
+
+// ==========================================
+// RUTAS PARA EL MÓDULO DE MASCOTAS (ROBUSTO)
+// ==========================================
+
+// 1. GET: Consultar todas las mascotas registradas
+app.get('/api/mascotas', (req, res) => {
+  try {
+    if (!fs.existsSync(mascotasPath)) {
+      return res.json({ mascotas: [] });
+    }
+    const contenido = fs.readFileSync(mascotasPath, 'utf-8');
+    const registros = parse(contenido, {
+      columns: true,
+      skip_empty_lines: true,
+      relax_column_count: true,
+      trim: true
+    });
+    res.json({ mascotas: registros });
+  } catch (err) {
+    console.error("Error leyendo mascotas:", err);
+    res.status(500).json({ error: "No se pudo leer la información de mascotas." });
+  }
+});
+
+// 2. POST: Guardar o actualizar la declaración de múltiples mascotas
+app.post('/api/mascotas', (req, res) => {
+  try {
+    const { torre, apto, tieneMascota, mascotas } = req.body;
+
+    if (!torre || !apto || tieneMascota === undefined) {
+      return res.status(400).json({ error: "Datos incompletos para el registro." });
+    }
+
+    let lineas = [];
+    if (fs.existsSync(mascotasPath)) {
+      const contenido = fs.readFileSync(mascotasPath, 'utf-8');
+      lineas = contenido.trim().split(/\r?\n/).filter(Boolean);
+    } else {
+      lineas = ['idMascota,torre,apto,tieneMascota,tipo,nombre,raza,vacunasAlDia,fechaRegistro'];
+    }
+
+    const fechaRegistro = new Date().toLocaleDateString("en-CA", { timeZone: "America/Bogota" });
+
+    // Filtrar registros anteriores de esta misma torre y apto para evitar duplicados al actualizar
+    const cabecera = lineas[0];
+    const restoLineas = lineas.slice(1).filter(linea => {
+      const partes = linea.split(',');
+      if (partes.length >= 3) {
+        const t = partes[1].trim();
+        const a = partes[2].trim();
+        return !(t.toLowerCase() === String(torre).trim().toLowerCase() && a.toLowerCase() === String(apto).trim().toLowerCase());
+      }
+      return true;
+    });
+
+    let nuevasLineas = [cabecera, ...restoLineas];
+
+    if (tieneMascota === 'No' || !mascotas || mascotas.length === 0) {
+      const idMascota = `MASC-${Date.now()}`;
+      const nuevaLinea = `${idMascota},${torre},${apto},No,N/A,N/A,N/A,N/A,${fechaRegistro}`;
+      nuevasLineas.push(nuevaLinea);
+    } else {
+      mascotas.forEach((m, idx) => {
+        const idMascota = `MASC-${Date.now()}-${idx}`;
+        const vacunas = m.vacunasAlDia || 'Sí';
+        const nuevaLinea = `${idMascota},${torre},${apto},Sí,${m.tipo || 'N/A'},${m.nombre || 'N/A'},${m.raza || 'N/A'},${vacunas},${fechaRegistro}`;
+        nuevasLineas.push(nuevaLinea);
+      });
+    }
+
+    fs.writeFileSync(mascotasPath, nuevasLineas.join('\n'), 'utf-8');
+    res.json({ mensaje: "Registros de mascotas guardados con éxito." });
+  } catch (err) {
+    console.error("Error guardando mascotas:", err);
+    res.status(500).json({ error: "No se pudo guardar la información." });
+  }
+});
 
 /* =========================
    Funciones CSV Notificaciones
@@ -331,6 +411,72 @@ app.delete('/api/notificaciones/:id', (req, res) => {
   } catch (error) {
     console.error('Error eliminando notificación:', error);
     res.status(500).json({ error: 'Error eliminando notificación' });
+  }
+});
+
+// GET: Obtener todas las mascotas (Exclusivo Admin)
+app.get('/api/mascotas', (req, res) => {
+  try {
+    if (!fs.existsSync(mascotasPath)) {
+      return res.json({ mascotas: [] });
+    }
+    const contenido = fs.readFileSync(mascotasPath, 'utf-8');
+    const lineas = contenido.trim().split('\n').filter(Boolean);
+    if (lineas.length <= 1) return res.json({ mascotas: [] });
+
+    const headers = lineas[0].split(',').map(h => h.trim());
+    const mascotas = lineas.slice(1).map(linea => {
+      const valores = linea.split(',').map(v => v.trim());
+      let obj = {};
+      headers.forEach((h, idx) => obj[h] = valores[idx] || '');
+      return obj;
+    });
+
+    res.json({ mascotas });
+  } catch (err) {
+    console.error("Error leyendo Mascotas.csv:", err);
+    res.status(500).json({ error: "Error al consultar mascotas." });
+  }
+});
+
+// POST: Registrar o actualizar la declaración de múltiples mascotas
+app.post('/api/mascotas', (req, res) => {
+  try {
+    const { torre, apto, tieneMascota, mascotas } = req.body;
+
+    if (!torre || !apto || tieneMascota === undefined) {
+      return res.status(400).json({ error: "Datos incompletos para el registro." });
+    }
+
+    let lineas = [];
+    if (fs.existsSync(mascotasPath)) {
+      const contenido = fs.readFileSync(mascotasPath, 'utf-8');
+      lineas = contenido.trim().split('\n').filter(Boolean);
+    } else {
+      lineas = ['idMascota,torre,apto,tieneMascota,tipo,nombre,raza,vacunasAlDia,fechaRegistro'];
+    }
+
+    const fechaRegistro = new Date().toISOString().split('T')[0];
+
+    if (tieneMascota === 'No' || !mascotas || mascotas.length === 0) {
+      // Registrar que no tiene mascotas
+      const idMascota = `MASC-${Date.now()}`;
+      const nuevaLinea = `${idMascota},${torre},${apto},No,N/A,N/A,N/A,N/A,${fechaRegistro}`;
+      lineas.push(nuevaLinea);
+    } else {
+      // Registrar cada mascota de la lista
+      mascotas.forEach((m, idx) => {
+        const idMascota = `MASC-${Date.now()}-${idx}`;
+        const nuevaLinea = `${idMascota},${torre},${apto},Sí,${m.tipo || 'N/A'},${m.nombre || 'N/A'},${m.raza || 'N/A'},${m.vacunasAlDia || 'N/A'},${fechaRegistro}`;
+        lineas.push(nuevaLinea);
+      });
+    }
+
+    fs.writeFileSync(mascotasPath, lineas.join('\n'), 'utf-8');
+    res.json({ mensaje: "Registros de mascotas guardados con éxito." });
+  } catch (err) {
+    console.error("Error guardando mascotas:", err);
+    res.status(500).json({ error: "No se pudo guardar la información." });
   }
 });
 
